@@ -6,15 +6,15 @@ public class Individuals {
     Individuals() {
         Random rand = new Random();
         decimalGenes = rand.nextInt(255);
-        fitness = (decimalGenes + 3)^2 - 25;
+        fitness = (decimalGenes + 3)*(decimalGenes+3) - 25;
     }
     Individuals(int decimalGenes) {
         this.decimalGenes = decimalGenes;
-        fitness = (decimalGenes + 3)^2 - 25;
+        fitness = (decimalGenes + 3)*(decimalGenes+3) - 25;
     }
     Individuals(String binaryStringGenes, int base) {
         decimalGenes = Integer.parseInt(binaryStringGenes, base);
-        fitness = (decimalGenes + 3)^2 - 25;
+        fitness = (decimalGenes + 3)*(decimalGenes+3) - 25;
     }
 
     public int getFitness() {
