@@ -6,14 +6,17 @@ public class Selection {
         better[1] = pop[1];
         for (int i = 2; i < nbpop; i++) {
             temp = pop[i];
-            if (temp.getFitness() < better[0].getFitness()) {
+            if (abs(temp.getFitness()) < abs(better[0].getFitness())) {
                 temp = better[0];
                 better[0] = pop[i];
             }
-            if (temp.getFitness() < better[1].getFitness()) {
+            if (abs(temp.getFitness()) < abs(better[1].getFitness())) {
                 better[1] = temp;
             }
         }
         return better;
+    }
+    public static long  abs(long a) {
+        return (a < 0) ? -a : a;
     }
 }

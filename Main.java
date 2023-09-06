@@ -13,8 +13,11 @@ public class Main {
         }
 
         //display pop
-        for (int i = 0; i < nbpop; i++) {
-            System.out.println(pop[i].getDecimalGenes());
+        System.out.println(pop[0].getDecimalGenes());
+        for (int i = 1; i < nbpop; i++) {
+            if (pop[i].getFitness() == 0) {
+                System.out.println(pop[i].getDecimalGenes());
+            }
         }
         Individuals[] best;
         String newpop;
@@ -22,7 +25,7 @@ public class Main {
 
         best = Selection.selection(pop, nbpop);
         //change this do while loop to a while loop
-        while (best[0].getFitness() > 0 && best[1].getFitness() > 0) {
+        while (best[0].getFitness() != 0 && best[1].getFitness() != 0 && counter[0]+counter[1] < 1000000) {
             best = Selection.selection(pop, nbpop);
             Random rand = new Random();
             if (rand.nextInt(10) < 3) {
@@ -40,11 +43,17 @@ public class Main {
             pop[1] = best[1];
             pop[2] = new Individuals(newpop, 2);
             nbpop = 3;
+            if (pop[2].getFitness() == 0) {
+                System.out.println(pop[2].getDecimalGenes());
+            }
 
         }
 
         System.out.println("The best individual is: " + pop[0].getDecimalGenes() + " and his fitness score is: " + pop[0].getFitness());
         System.out.println("The number of mutation is: " + counter[0]);
         System.out.println("The number of crossover is: " + counter[1]);
+
+
+        sc.close();
     }
 }
