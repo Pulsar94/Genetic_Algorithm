@@ -14,11 +14,11 @@ public class Main {
 
         // display pop
         // System.out.println(pop[0].getDecimalGenes());
-        for (int i = 1; i < nbpop; i++) {
-            if (pop[i].getFitness() == 0) {
-                System.out.println(pop[i].getDecimalGenes());
-            }
-        }
+        // for (int i = 1; i < nbpop; i++) {
+        // if (pop[i].getFitness() == 0) {
+        // System.out.println(pop[i].getDecimalGenes());
+        // }
+        // }
         Individuals[] best;
         String newpop;
         int[] counter = { 0, 0 };
