@@ -1,10 +1,24 @@
 import java.util.Random;
 
-public class Population {
+public class Individuals {
     private int decimalGenes;
-    Population() {
+    private int fitness;
+    Individuals() {
         Random rand = new Random();
         decimalGenes = rand.nextInt(255);
+        fitness = (decimalGenes + 3)^2 - 25;
+    }
+    Individuals(int decimalGenes) {
+        this.decimalGenes = decimalGenes;
+        fitness = (decimalGenes + 3)^2 - 25;
+    }
+    Individuals(String binaryStringGenes, int base) {
+        decimalGenes = Integer.parseInt(binaryStringGenes, base);
+        fitness = (decimalGenes + 3)^2 - 25;
+    }
+
+    public int getFitness() {
+        return fitness;
     }
     public int getDecimalGenes() {
         return decimalGenes;
