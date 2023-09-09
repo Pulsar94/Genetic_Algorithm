@@ -1,23 +1,59 @@
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import java.util.Random;
+import java.util.Scanner;
+import java.util.function.Function;
 
 public class Individuals {
-    private int decimalGenes;
-    private final int fitness;
+    private static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
+    private static int decimalGenes;
+    private static int fitness;
+    private static String fitnessFunction;
 
-    Individuals() {
+    public Individuals(String fitnessFunction) throws ScriptException {
+        Individuals.fitnessFunction = fitnessFunction;
         Random rand = new Random();
         decimalGenes = rand.nextInt(256);
-        fitness = (int) Math.pow((decimalGenes + 3), 2) - 25;
+        evaluateFitness();
     }
 
-    Individuals(int decimalGenes) {
-        this.decimalGenes = decimalGenes;
-        fitness = (int) Math.pow((decimalGenes + 3), 2) - 25;
+    public Individuals(int decimalGenes, String fitnessFunction) throws ScriptException {
+        Individuals.decimalGenes = decimalGenes;
+        Individuals.fitnessFunction = fitnessFunction;
+        evaluateFitness();
     }
 
-    Individuals(String binaryStringGenes, int base) {
+    Individuals(String binaryStringGenes, int base, String fitnessFunction) throws ScriptException {
+        Individuals.fitnessFunction = fitnessFunction;
         decimalGenes = Integer.parseInt(binaryStringGenes, base);
-        fitness = (int) Math.pow((decimalGenes + 3), 2) - 25;
+        evaluateFitness();
+    }
+
+    private static void evaluateFitness() throws ScriptException {
+        synchronized(engine) {
+            engine.put("x", decimalGenes);
+            Double result = (Double) engine.eval(String.format("Math.floor(%s)", fitnessFunction));
+            fitness = result.intValue();
+        }
+    }
+
+    public static double evaluateExpression(String expression, int x) throws ScriptException {
+        synchronized(engine) {
+            engine.put("x", x);
+            return (Double) engine.eval(expression);
+        }
+    }
+
+    public static Integer findRoot(String function) throws ScriptException {
+        for (int x = 0; x <= 255; x++) {
+            double f_x = evaluateExpression(function, x);
+
+            if (Math.abs(f_x) < 1e-7) { // Assuming a small enough value is practically a root
+                return x;
+            }
+        }
+        return null; // No root found
     }
 
     public int getFitness() {
