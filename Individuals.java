@@ -7,8 +7,8 @@ import java.util.function.Function;
 
 public class Individuals {
     private static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
-    private static int decimalGenes;
-    private static int fitness;
+    private int decimalGenes;
+    private int fitness;
     private static String fitnessFunction;
 
     public Individuals(String fitnessFunction) throws ScriptException {
@@ -19,22 +19,22 @@ public class Individuals {
     }
 
     public Individuals(int decimalGenes, String fitnessFunction) throws ScriptException {
-        Individuals.decimalGenes = decimalGenes;
+        this.decimalGenes = decimalGenes;
         Individuals.fitnessFunction = fitnessFunction;
         evaluateFitness();
     }
 
     Individuals(String binaryStringGenes, int base, String fitnessFunction) throws ScriptException {
         Individuals.fitnessFunction = fitnessFunction;
-        decimalGenes = Integer.parseInt(binaryStringGenes, base);
+        this.decimalGenes = Integer.parseInt(binaryStringGenes, base);
         evaluateFitness();
     }
 
-    private static void evaluateFitness() throws ScriptException {
+    private void evaluateFitness() throws ScriptException {
         synchronized(engine) {
-            engine.put("x", decimalGenes);
+            engine.put("x", getDecimalGenes());
             Double result = (Double) engine.eval(String.format("Math.floor(%s)", fitnessFunction));
-            fitness = result.intValue();
+            setFitness(result.intValue());
         }
     }
 
@@ -59,6 +59,9 @@ public class Individuals {
     public int getFitness() {
         return fitness;
     }
+    public void setFitness(int fitness) {
+        this.fitness = fitness;
+    }
 
     public int getDecimalGenes() {
         return decimalGenes;
@@ -74,6 +77,15 @@ public class Individuals {
             binaryGenes = "0" + binaryGenes;
         }
         return binaryGenes;
+    }
+
+    public int[] getArrayGenes() {
+        String binaryGenes = getBinaryGenes(); // Existing method that returns binary representation
+        int[] genes = new int[8]; // Assuming 8 genes
+        for (int i = 0; i < binaryGenes.length(); i++) {
+            genes[i] = Character.getNumericValue(binaryGenes.charAt(i));
+        }
+        return genes;
     }
 
     public void setBinaryGenes(String binaryGenes) {

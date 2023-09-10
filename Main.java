@@ -11,22 +11,23 @@ public class Main {
         System.out.println(Const.defaultValue + "Press " + Const.red + Const.underline + "Enter\033[0m" + Const.defaultValue + " to continue");
         sc.nextLine();
         do {
+            clearScreen();
             System.out.println(Const.defaultValue + "Enter the number of individuals in the population or press " + Const.red + Const.underline + "Enter\033[0m" + Const.defaultValue + " for default:");
 
-            // Handling nbpop
+            // Handling individualsNumber
             int valid = 0;
-            int nbpop = -1; // Initialize to an invalid value
+            int individualsNumber = -1; // Initialize to an invalid value
 
             do {
-                String nbpopStr = sc.nextLine();
-                if (nbpopStr.isEmpty()) {
-                    nbpop = 15;
+                String individualsNumberStr = sc.nextLine();
+                if (individualsNumberStr.isEmpty()) {
+                    individualsNumber = 15;
                     break;
                 }
 
                 try {
-                    nbpop = Integer.parseInt(nbpopStr);
-                    if (nbpop <= 0) {
+                    individualsNumber = Integer.parseInt(individualsNumberStr);
+                    if (individualsNumber <= 0) {
                         System.out.println(Const.defaultValue + "The population size must be a positive integer. Please try again.");
                     } else {
                         valid = 1;
@@ -69,27 +70,25 @@ public class Main {
 
             } while (valid == 0);
 
-            System.out.println(Const.defaultValue + "Using a population size of " + nbpop);
+            System.out.println(Const.defaultValue + "Using a population size of " + individualsNumber);
             System.out.println(Const.defaultValue + "Using the following fitness function: " + initialCustomFitnessFunction + "\n");
 
             if (initialCustomFitnessFunction.contains("^")) {
-                String regex = "\\s*([\\w\\s+\\-*/()]+)\\s*\\^\\s*(\\d+)\\s*";
-                customFitnessFunction = initialCustomFitnessFunction.replaceAll(regex, "Math.pow($1, $2)");
+                customFitnessFunction = reformatFunction(initialCustomFitnessFunction);
             } else {
                 customFitnessFunction = initialCustomFitnessFunction;
             }
 
 
-            Individuals[] pop = new Individuals[nbpop];
-            for (int i = 0; i < nbpop; i++) {
+            Individuals[] pop = new Individuals[individualsNumber];
+            for (int i = 0; i < individualsNumber; i++) {
                 pop[i] = new Individuals(customFitnessFunction);
             }
 
             Individuals[] best;
-            String newpop = "";
             int[] counter = {0, 0};
 
-            best = Selection.selection(pop, nbpop);
+            best = Selection.selection(pop, individualsNumber);
 
             //use the newton algorithm to find the root of the function
             if (best[0].getFitness() == 0) {
@@ -103,12 +102,12 @@ public class Main {
                 System.out.println(Const.defaultValue + "There is no root found for the following function between 0 and 255" +
                         "\nf(x) -> " + initialCustomFitnessFunction);
                 while (best[0].getFitness() != 0 && best[1].getFitness() != 0 && counter[0] + counter[1] < 1000000) {
-                    evolution(pop, nbpop, counter, customFitnessFunction);
+                    evolution(pop, individualsNumber, counter, customFitnessFunction);
                 }
             } else {
                 System.out.println(Const.defaultValue + "The root of the function is: " + Individuals.findRoot(customFitnessFunction));
-                while (best[0].getFitness() != 0 && best[1].getFitness() != 0) {
-                    evolution(pop, nbpop, counter, customFitnessFunction);
+                while (best[0].getFitness() != 0 && best[1].getFitness() != 0  && counter[0] + counter[1] < 1000000) {
+                    evolution(pop, individualsNumber, counter, customFitnessFunction);
                 }
             }
 
@@ -123,8 +122,8 @@ public class Main {
         sc.close();
     }
 
-    public static void evolution(Individuals[] pop, int nbpop, int[] counter, String customFitnessFunction) throws ScriptException {
-        Individuals[] best = Selection.selection(pop, nbpop);
+    public static void evolution(Individuals[] pop, int individualsNumber, int[] counter, String customFitnessFunction) throws ScriptException {
+        Individuals[] best = Selection.selection(pop, individualsNumber);
         Random rand = new Random();
         String newpop;
         if (rand.nextInt(10) < 3) {
@@ -141,7 +140,17 @@ public class Main {
         pop[0] = best[0];
         pop[1] = best[1];
         pop[2] = new Individuals(newpop, 2, customFitnessFunction);
-        nbpop = 3;
+        individualsNumber = 3;
+    }
+
+    public static String reformatFunction(String function) {
+        String regex = "\\s*([\\w\\s+\\-*/()]+)\\s*\\^\\s*(\\d+)\\s*";
+        return function.replaceAll(regex, "Math.pow($1, $2)");
+    }
+
+    public static void clearScreen() {
+        System.out.print("\033[H\033[2J");
+        System.out.flush();
     }
 
 }
