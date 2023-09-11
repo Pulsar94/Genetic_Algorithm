@@ -70,22 +70,25 @@ public class Main {
 
             } while (valid == 0);
 
+            System.out.println(Const.defaultValue + "Do you want to to mutate many genes at once? " + Const.red + Const.underline + "y/n" + Const.defaultValue + "(default no)");
+            String mutation = scanner.nextLine();
+            int numberGenes = 1;
+            if (mutation.equalsIgnoreCase("Y")) {
+                do {
+                    System.out.println(Const.defaultValue + "Enter the number of genes to mutate or press " + Const.red + Const.underline + "Enter" + Const.defaultValue + " for default:");
+                    if (scanner.hasNextInt()) {
+                        numberGenes = scanner.nextInt();
+                        if (numberGenes > 8 || numberGenes < 1) {
+                            System.out.println(Const.defaultValue + "The number of genes to mutate must be between 1 and 8. Please try again.");
+                        }
+                    }
+                } while (numberGenes < 1 || numberGenes > 8);
+            }
+
             System.out.println(Const.defaultValue + "Using a population size of " + individualsNumber);
             System.out.println(Const.defaultValue + "Using the following fitness function: " + initialCustomFitnessFunction + "\n");
 
             customFitnessFunction = reformat(initialCustomFitnessFunction);
-//            if (initialCustomFitnessFunction.contains("^")) {
-//                customFitnessFunction = reformatPower(initialCustomFitnessFunction);
-//            }
-//            if (initialCustomFitnessFunction.contains("sin")) {
-//                customFitnessFunction = reformatSin(initialCustomFitnessFunction);
-//            }
-//            if (initialCustomFitnessFunction.contains("cos")) {
-//                customFitnessFunction = reformatCos(initialCustomFitnessFunction);
-//            }
-//            if (initialCustomFitnessFunction.contains("exp")) {
-//                customFitnessFunction = reformatExp(initialCustomFitnessFunction);
-//            }
 
 
             Individuals[] pop = new Individuals[individualsNumber];
@@ -118,7 +121,7 @@ public class Main {
                 System.out.println(Const.defaultValue + "The root of the function is: " + Individuals.findRoot(customFitnessFunction));
             }
             while (pop[0].getFitness() != 0 && pop[1].getFitness() != 0 && counter[0] + counter[1] < 1000000) {
-                pop = evolution(pop, individualsNumber, counter, customFitnessFunction);
+                pop = evolution(pop, individualsNumber, counter, customFitnessFunction, numberGenes);
                 individualsNumber = 3;
             }
 
@@ -133,14 +136,15 @@ public class Main {
         sc.close();
     }
 
-    public static Individuals[] evolution(Individuals[] pop, int individualsNumber, int[] counter, String customFitnessFunction) throws ScriptException {
+    public static Individuals[] evolution(Individuals[] pop, int individualsNumber, int[] counter, String customFitnessFunction, int numberGenes) throws ScriptException {
         Individuals[] best = Selection.selection(pop, individualsNumber);
         Random rand = new Random();
         String newpop;
         if (rand.nextInt(10) < 3) {
             // System.out.println("Mutation");
             Mutation mut = new Mutation();
-            newpop = mut.mutation(best[0].getBinaryGenes(), 1);
+            newpop = mut.mutation(best[0].getBinaryGenes(), numberGenes);
+//            System.out.println("Before: " + best[0].getBinaryGenes() + " After: " + newpop);
             counter[0]++;
         } else {
             // System.out.println("Crossover");

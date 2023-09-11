@@ -18,6 +18,7 @@ public class Mutation {
                 } else {
                     System.out.println("Something wrong with the mutation");
                 }
+                count_mut++; // increment the count of mutation
             }
             seq_mutated.append(i); // add every genes in the sequence mutated
         }
