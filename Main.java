@@ -5,13 +5,11 @@ import java.util.Scanner;
 public class Main {
     public static void main(String args[]) throws ScriptException {
         Scanner sc = new Scanner(System.in);
-        int continueProgram = 1;
 
         System.out.println(Const.defaultValue + Const.bold + "Welcome to the Genetic Algorithm program");
         System.out.println(Const.defaultValue + "Press " + Const.red + Const.underline + "Enter\033[0m" + Const.defaultValue + " to continue");
         sc.nextLine();
         do {
-            clearScreen();
             System.out.println(Const.defaultValue + "Enter the number of individuals in the population or press " + Const.red + Const.underline + "Enter\033[0m" + Const.defaultValue + " for default:");
 
             // Handling individualsNumber
@@ -83,7 +81,13 @@ public class Main {
             Individuals[] pop = new Individuals[individualsNumber];
             for (int i = 0; i < individualsNumber; i++) {
                 pop[i] = new Individuals(customFitnessFunction);
+                //if (pop[i].getDecimalGenes() == 2){
+                    System.out.println(pop[i].getDecimalGenes());
+                    //System.out.println(pop[i].getFitness());
+                //}
             }
+
+
 
             Individuals[] best;
             int[] counter = {0, 0};
@@ -99,21 +103,18 @@ public class Main {
 
 
             if (Individuals.findRoot(customFitnessFunction) == null) {
-                System.out.println(Const.defaultValue + "There is no root found for the following function between 0 and 255" +
-                        "\nf(x) -> " + initialCustomFitnessFunction);
-                while (best[0].getFitness() != 0 && best[1].getFitness() != 0 && counter[0] + counter[1] < 1000000) {
-                    evolution(pop, individualsNumber, counter, customFitnessFunction);
-                }
+                System.out.println(Const.defaultValue + "There is no root found for the following function between 0 and 255\nf(x) -> " + initialCustomFitnessFunction);
             } else {
                 System.out.println(Const.defaultValue + "The root of the function is: " + Individuals.findRoot(customFitnessFunction));
-                while (best[0].getFitness() != 0 && best[1].getFitness() != 0  && counter[0] + counter[1] < 1000000) {
-                    evolution(pop, individualsNumber, counter, customFitnessFunction);
-                }
+            }
+            while (pop[0].getFitness() != 0 && pop[1].getFitness() != 0 && counter[0] + counter[1] < 1000000) {
+                pop = evolution(pop, individualsNumber, counter, customFitnessFunction);
+                individualsNumber = 3;
             }
 
 
-            System.out.println(Const.defaultValue + "The best individual is: " + best[0].getDecimalGenes() + " and his fitness score is: "
-                    + best[0].getFitness());
+            System.out.println(Const.defaultValue + "The best individual is: " + pop[0].getDecimalGenes() + " and his fitness score is: "
+                    + pop[0].getFitness());
             System.out.println(Const.defaultValue + "The number of mutation is: " + counter[0]);
             System.out.println(Const.defaultValue + "The number of crossover is: " + counter[1]);
             System.out.println(Const.defaultValue + "\nPress " + Const.red + Const.underline + "Enter" + Const.defaultValue + " to continue or press " + Const.red + Const.underline + "0" + Const.defaultValue + " to exit");
@@ -122,7 +123,7 @@ public class Main {
         sc.close();
     }
 
-    public static void evolution(Individuals[] pop, int individualsNumber, int[] counter, String customFitnessFunction) throws ScriptException {
+    public static Individuals[] evolution(Individuals[] pop, int individualsNumber, int[] counter, String customFitnessFunction) throws ScriptException {
         Individuals[] best = Selection.selection(pop, individualsNumber);
         Random rand = new Random();
         String newpop;
@@ -137,20 +138,19 @@ public class Main {
             newpop = cross.crossover(best[0].getBinaryGenes(), best[1].getBinaryGenes());
             counter[1]++;
         }
+
         pop[0] = best[0];
         pop[1] = best[1];
         pop[2] = new Individuals(newpop, 2, customFitnessFunction);
-        individualsNumber = 3;
+        return pop;
+        //if (pop[2].getDecimalGenes() == 2){
+            //System.out.println(pop[2].getDecimalGenes());
+            //System.out.println(pop[2].getFitness());
+        //}
     }
 
     public static String reformatFunction(String function) {
         String regex = "\\s*([\\w\\s+\\-*/()]+)\\s*\\^\\s*(\\d+)\\s*";
         return function.replaceAll(regex, "Math.pow($1, $2)");
     }
-
-    public static void clearScreen() {
-        System.out.print("\033[H\033[2J");
-        System.out.flush();
-    }
-
 }
