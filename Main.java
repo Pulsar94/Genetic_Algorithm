@@ -3,7 +3,7 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
-    public static void main(String args[]) throws ScriptException {
+    public static void main(String[] args) throws ScriptException {
         Scanner sc = new Scanner(System.in);
 
         System.out.println(Const.defaultValue + Const.bold + "Welcome to the Genetic Algorithm program");
@@ -16,6 +16,7 @@ public class Main {
             int valid = 0;
             int individualsNumber = -1; // Initialize to an invalid value
 
+            // Loop to choose population size
             do {
                 String individualsNumberStr = sc.nextLine();
                 if (individualsNumberStr.isEmpty()) {
@@ -43,6 +44,7 @@ public class Main {
             Scanner scanner = new Scanner(System.in);
             valid = 0;
 
+            // To choose fitness function
             System.out.println(Const.defaultValue + "Enter your custom fitness function using 'x' as the variable [e.g., (x + 3)^2 - 25] or press " + Const.red + Const.underline + "Enter" + Const.defaultValue + " for default:");
             do {
                 initialCustomFitnessFunction = scanner.nextLine();
@@ -58,7 +60,7 @@ public class Main {
                 }
 
                 for (char c : initialCustomFitnessFunction.toCharArray()) {
-                    if (!Character.isDigit(c) && "x+*-/^() ".indexOf(c) == -1) {
+                    if (!Character.isDigit(c) && "x+*-/^()sincoexpMath. ".indexOf(c) == -1) {
                         System.out.println(Const.defaultValue + "Invalid character detected: " + c);
                         valid = 0;
                         break; // Exit the 'for' loop
@@ -71,11 +73,19 @@ public class Main {
             System.out.println(Const.defaultValue + "Using a population size of " + individualsNumber);
             System.out.println(Const.defaultValue + "Using the following fitness function: " + initialCustomFitnessFunction + "\n");
 
-            if (initialCustomFitnessFunction.contains("^")) {
-                customFitnessFunction = reformatFunction(initialCustomFitnessFunction);
-            } else {
-                customFitnessFunction = initialCustomFitnessFunction;
-            }
+            customFitnessFunction = reformat(initialCustomFitnessFunction);
+//            if (initialCustomFitnessFunction.contains("^")) {
+//                customFitnessFunction = reformatPower(initialCustomFitnessFunction);
+//            }
+//            if (initialCustomFitnessFunction.contains("sin")) {
+//                customFitnessFunction = reformatSin(initialCustomFitnessFunction);
+//            }
+//            if (initialCustomFitnessFunction.contains("cos")) {
+//                customFitnessFunction = reformatCos(initialCustomFitnessFunction);
+//            }
+//            if (initialCustomFitnessFunction.contains("exp")) {
+//                customFitnessFunction = reformatExp(initialCustomFitnessFunction);
+//            }
 
 
             Individuals[] pop = new Individuals[individualsNumber];
@@ -118,7 +128,7 @@ public class Main {
             System.out.println(Const.defaultValue + "The number of mutation is: " + counter[0]);
             System.out.println(Const.defaultValue + "The number of crossover is: " + counter[1]);
             System.out.println(Const.defaultValue + "\nPress " + Const.red + Const.underline + "Enter" + Const.defaultValue + " to continue or press " + Const.red + Const.underline + "0" + Const.defaultValue + " to exit");
-        } while (sc.nextLine().equals(""));
+        } while (sc.nextLine().isEmpty());
 
         sc.close();
     }
@@ -149,8 +159,28 @@ public class Main {
         //}
     }
 
-    public static String reformatFunction(String function) {
-        String regex = "\\s*([\\w\\s+\\-*/()]+)\\s*\\^\\s*(\\d+)\\s*";
-        return function.replaceAll(regex, "Math.pow($1, $2)");
+
+    public static String reformat(String function) {
+        // Replace ^ with Math.pow
+        String regexPow = "\\s*([\\w\\s+\\-*/()]+)\\s*\\^\\s*(\\d+)\\s*";
+        function = function.replaceAll(regexPow, "Math.pow($1, $2)");
+
+        // Replace sin()
+        String regexSin = "\\s*sin\\(\\s*([^\\)]+)\\s*\\)\\s*";
+        function = function.replaceAll(regexSin, "Math.sin($1)");
+
+        // Replace cos()
+        String regexCos = "\\s*cos\\(\\s*([^\\)]+)\\s*\\)\\s*";
+        function = function.replaceAll(regexCos, "Math.cos($1)");
+
+        // Replace exp()
+        String regexExp = "\\s*exp\\(\\s*([^\\)]+)\\s*\\)\\s*";
+        function = function.replaceAll(regexExp, "Math.exp($1)");
+
+        // Replace pi
+        String regexPi = "\\bpi\\b";
+        function = function.replaceAll(regexPi, String.valueOf(Math.PI));
+
+        return function;
     }
 }

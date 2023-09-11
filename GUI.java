@@ -115,7 +115,7 @@ public class GUI extends JFrame {
         String initialCustomFitnessFunction = initialCustomFitnessFunctionTextField.getText();
         String customFitnessFunction;
         if (initialCustomFitnessFunction.contains("^")) {
-            customFitnessFunction = Main.reformatFunction(initialCustomFitnessFunction);
+            customFitnessFunction = Main.reformat(initialCustomFitnessFunction);
         } else {
             customFitnessFunction = initialCustomFitnessFunction;
         }
