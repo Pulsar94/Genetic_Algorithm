@@ -17,8 +17,8 @@ public class Mutation {
             bitMutated[i] = tempBit;
             //System.out.println("Bit mutated: " + bitMutated[i]);
         }
-//        if (bitMutated[0] == bitMutated[1])
-//            System.out.println("Error :" + bitMutated[0] + " " + bitMutated[1]);
+        //if (bitMutated[0] == bitMutated[1])
+            //System.out.println("Error :" + bitMutated[0] + " " + bitMutated[1]);
         String newSequence = oldSequence;
         for (int bit:bitMutated) {
             newSequence = newSequence.substring(0, bit) + (newSequence.charAt(bit) == '0' ? '1' : '0') + newSequence.substring(bit + 1); // replace the bit at the position bitMutated by the opposite
