@@ -4,24 +4,28 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GUI extends JFrame {
     //region attributes
+    private JFrame frame;
     private final JTextField nbpopTextField;
     private final JTextField nbMutationTextField;
     private final JTextField initialCustomFitnessFunctionTextField;
     private final JCheckBox avoidTwinsCheckBox;
     private JTable outputTable;
+    private boolean twins = true;
     private final DefaultTableModel tableModel;
     private int time = 2500;
     boolean applyCustomRenderer = false;
     boolean crossover = false;
     private Individuals[] pop;
     private int individualsNumber;
-    private int mutationNumner;
+    private int mutationNumber;
     private String customFitnessFunction;
     private DefaultTableModel model;
     private int[] counter = {0, 0};
@@ -37,7 +41,7 @@ public class GUI extends JFrame {
         setTitle("Genetic Algorithm");
         try {
             // Initialize an Image object with the path to your icon
-            Image icon = Toolkit.getDefaultToolkit().getImage("pngtree-dna-icon-design-png-image_1499059.jpg");
+            Image icon = Toolkit.getDefaultToolkit().getImage("DNA.jpg");
             // Set the window icon
             setIconImage(icon);
         } catch (Exception e) {
@@ -70,29 +74,15 @@ public class GUI extends JFrame {
         nbMutationTextField.setText("1");
 
         // Add components for twins
-        //add(new JLabel("Avoid twins:"));
+        add(new JLabel("Avoid twins:"));
         avoidTwinsCheckBox = new JCheckBox();
-        //add(avoidTwinsCheckBox);
+        add(avoidTwinsCheckBox);
         avoidTwinsCheckBox.setSelected(true);
 
 
         // Add a button to generate the initial population
         JButton generateButton = new JButton("Start");
-        add(generateButton);
 
-        generateButton.addActionListener(e -> {
-            try {
-                counter = new int[]{0, 0};
-                generateInitialPopulation();
-            } catch (ScriptException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-
-        generateButton.addActionListener(e -> {
-            // Set your custom cell renderer here
-            outputTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
-        });
 
         String[] columnNames = {"Individual",
                 "Decimal",
@@ -187,9 +177,15 @@ public class GUI extends JFrame {
         outputTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
         outputTable.repaint();
 
+
+
+        add(generateButton);
+
+
         //add a next button
         JButton nextButton = new JButton("Next");
         add(nextButton);
+
         nextButton.addActionListener(e -> evolvingPopulation());
         nextButton.addActionListener(e -> {
             // Set your custom cell renderer here
@@ -197,7 +193,12 @@ public class GUI extends JFrame {
         });
 
         JButton skipButton = new JButton("Skip");
+
+        nextButton.setEnabled(false);
+        skipButton.setEnabled(false);
+
         add(skipButton);
+
         skipButton.addActionListener(e -> {
             try {
                 evolvedPopulation();
@@ -210,7 +211,54 @@ public class GUI extends JFrame {
             outputTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
         });
 
+        generateButton.addActionListener(e -> {
+            // Validation for nbpopTextField
+            String nbpopText = nbpopTextField.getText();
+            try {
+                int value = Integer.parseInt(nbpopText);
+                if (value < 3) {
+                    JOptionPane.showMessageDialog(null, "The value of the number of individuals should be greater than or equal to 3");
+                    return;
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Please enter a valid integer for the number of individuals");
+                return;
+            }
 
+            // Validation for nbMutationTextField
+            String nbMutationText = nbMutationTextField.getText();
+            try {
+                int value = Integer.parseInt(nbMutationText);
+                if (value < 0 || value > 8) {
+                    JOptionPane.showMessageDialog(null, "The value of number of mutation should be between 0 and 8");
+                    return;
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(null, "Please enter a valid integer for the number of mutations");
+                return;
+            }
+
+            // Validation for initialCustomFitnessFunctionString
+            String customFitnessText = initialCustomFitnessFunctionTextField.getText();
+            if (!customFitnessText.matches("[0-9+\\-*/^x() ]+")) {
+                JOptionPane.showMessageDialog(null, "Only numbers, operators, '^', and 'x' are allowed in Custom Fitness");
+                return;
+            }
+            try {
+                nextButton.setEnabled(true);
+                skipButton.setEnabled(true);
+                time = 2500;
+                counter = new int[]{0, 0};
+                generateInitialPopulation();
+            } catch (ScriptException ex) {
+                throw new RuntimeException(ex);
+            }
+        });
+
+        generateButton.addActionListener(e -> {
+            // Set your custom cell renderer here
+            outputTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
+        });
 
         pack();
         setVisible(true);
@@ -218,47 +266,69 @@ public class GUI extends JFrame {
 
 
     private void generateInitialPopulation() throws ScriptException {
-        applyCustomRenderer = false;
+        String nbpopString = nbpopTextField.getText();
+        String nbMutationString = nbMutationTextField.getText();
+        String initialCustomFitnessFunctionString = initialCustomFitnessFunctionTextField.getText();
+        twins = !avoidTwinsCheckBox.isSelected();
 
-        individualsNumber = Integer.parseInt(nbpopTextField.getText());
-        mutationNumner = Integer.parseInt(nbMutationTextField.getText());
-        String initialCustomFitnessFunction = initialCustomFitnessFunctionTextField.getText();
-        if (initialCustomFitnessFunction.contains("^")) {
-            customFitnessFunction = Main.reformat(initialCustomFitnessFunction);
+        System.out.println(twins);
+        if (nbpopString.equals("") || nbMutationString.equals("") || initialCustomFitnessFunctionString.equals("")) {
+            JOptionPane.showMessageDialog(frame, "Please fill all fields.", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
-            customFitnessFunction = initialCustomFitnessFunction;
-        }
+            applyCustomRenderer = false;
 
-        pop = new Individuals[individualsNumber];
-        for (int i = 0; i < individualsNumber; i++) {
-            pop[i] = new Individuals(customFitnessFunction);
-            //System.out.println(pop[i].getDecimalGenes());
-        }
-
-        model = (DefaultTableModel) outputTable.getModel();
-        model.setRowCount(0); // Clear existing rows
-
-        for (int i = 0; i < individualsNumber; i++) {
-
-            String binaryString = pop[i].getBinaryGenes();
-            Object[] rowData = new Object[11];
-            rowData[0] = (i + 1);
-            rowData[1] = pop[i].getDecimalGenes();
-            //System.out.println(pop[i].getDecimalGenes());
-            rowData[2] = binaryString;
-
-            int[] genes = pop[i].getArrayGenes();
-            for (int j = 3; j <= 10; j++) {
-                rowData[j] = genes[j - 3]; // Filling in Gen 1 to Gen 8
+            individualsNumber = Integer.parseInt(nbpopString);
+            mutationNumber = Integer.parseInt(nbMutationString);
+            if (initialCustomFitnessFunctionString.contains("^")) {
+                customFitnessFunction = Main.reformat(initialCustomFitnessFunctionString);
+            } else {
+                customFitnessFunction = initialCustomFitnessFunctionString;
             }
 
-            model.addRow(rowData);
+            pop = new Individuals[individualsNumber];
+            for (int i = 0; i < individualsNumber; i++) {
+                pop[i] = new Individuals(customFitnessFunction);
+                for (int j = 0; j < i; j++) {
+                    if (pop[i].getDecimalGenes() == pop[j].getDecimalGenes()) {
+                        if (!twins) {
+                            i--;
+                            break;
+                        } else {
+                            pop[i] = new Individuals(customFitnessFunction);
+                            j = -1;
+                        }
+                    }
+                }
+            }
 
+            model = (DefaultTableModel) outputTable.getModel();
+            model.setRowCount(0); // Clear existing rows
+
+            for (int i = 0; i < individualsNumber; i++) {
+
+                String binaryString = pop[i].getBinaryGenes();
+                Object[] rowData = new Object[11];
+                rowData[0] = (i + 1);
+                rowData[1] = pop[i].getDecimalGenes();
+                //System.out.println(pop[i].getDecimalGenes());
+                rowData[2] = binaryString;
+
+                int[] genes = pop[i].getArrayGenes();
+                for (int j = 3; j <= 10; j++) {
+                    rowData[j] = genes[j - 3]; // Filling in Gen 1 to Gen 8
+                }
+
+                model.addRow(rowData);
+
+            }
+            evolvingPopulation();
         }
-        evolvingPopulation();
+
     }
 
     private void evolvingPopulation() {
+        twins = !avoidTwinsCheckBox.isSelected();
+        applyCustomRenderer = false;
         Timer timer = new Timer(time-500, e -> {
 
             getTwoBestIndividuals();
@@ -272,27 +342,31 @@ public class GUI extends JFrame {
             Object[] crossoverRowData = new Object[11];
 
             Random rand = new Random();
-            if (rand.nextInt(10) < 3) {
-                counter[0]++;
-                crossoverRowData[0] = "M" + counter[0];
-                crossover = false;
-                try {
-                    pop[2] = new Individuals(Mutation.mutation(best[0].getBinaryGenes(), mutationNumner), 2,customFitnessFunction);
-                    //System.out.println("Mutations index : "+Mutation.bitMutated[0] + ";" + Mutation.bitMutated[1]);
-                } catch (ScriptException ex) {
-                    throw new RuntimeException(ex);
+
+            do {
+                if (rand.nextInt(10) < (mutationNumber == 0 ? 0 : 3)) {
+                    counter[0]++;
+                    crossoverRowData[0] = "M" + counter[0];
+                    crossover = false;
+                    try {
+                        pop[2] = new Individuals(Mutation.mutation(best[0].getBinaryGenes(), mutationNumber), 2, customFitnessFunction);
+                        //System.out.println("Mutations index : "+Mutation.bitMutated[0] + ";" + Mutation.bitMutated[1]);
+                    } catch (ScriptException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                } else {
+                    counter[1]++;
+                    crossoverRowData[0] = "C" + counter[1];
+                    crossover = true;
+                    try {
+                        pop[2] = new Individuals(Crossover.crossover(best[0].getBinaryGenes(), best[1].getBinaryGenes()), 2, customFitnessFunction);
+                    } catch (ScriptException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                    System.out.println(pop[2].getBinaryGenes());
                 }
-            } else {
-                counter[1]++;
-                crossoverRowData[0] = "C" + counter[1];
-                crossover = true;
-                try {
-                    pop[2] = new Individuals(Crossover.crossover(best[0].getBinaryGenes(), best[1].getBinaryGenes()), 2,customFitnessFunction);
-                } catch (ScriptException ex) {
-                    throw new RuntimeException(ex);
-                }
-                System.out.println(pop[2].getBinaryGenes());
-            }
+            }while (!twins && (pop[2].getDecimalGenes() == best[0].getDecimalGenes() || pop[2].getDecimalGenes() == best[1].getDecimalGenes()));
+
             pop[0] = best[0];
             pop[1] = best[1];
             individualsNumber = 3;
@@ -311,12 +385,13 @@ public class GUI extends JFrame {
             ((Timer)e.getSource()).stop();
         }).start();
         time = 0;
-
     }
     private void evolvedPopulation() throws ScriptException {
+        twins = !avoidTwinsCheckBox.isSelected();
+        applyCustomRenderer = false;
         model.setRowCount(0); // Clear existing rows
-        while (pop[0].getFitness() != 0 && pop[1].getFitness() != 0 && counter[0] + counter[1] < 1000000) {
-            pop = Main.evolution(pop, individualsNumber, counter, customFitnessFunction, 1);
+        while (pop[0].getFitness() != 0 && pop[1].getFitness() != 0 && counter[0] + counter[1] < 10000) {
+            pop = Main.evolution(pop, individualsNumber, counter, customFitnessFunction, mutationNumber, twins);
             individualsNumber = 3;
         }
         Object[] crossoverRowData = new Object[11];

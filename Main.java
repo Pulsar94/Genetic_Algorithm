@@ -4,6 +4,7 @@ import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws ScriptException {
+        boolean twins = true;
         Scanner sc = new Scanner(System.in);
         System.out.println(Const.defaultValue + Const.bold + "Welcome to the Genetic Algorithm program");
         System.out.println(Const.defaultValue + "Press " + Const.red + Const.underline + "Enter\033[0m" + Const.defaultValue + " to continue");
@@ -59,7 +60,7 @@ public class Main {
                 }
 
                 for (char c : initialCustomFitnessFunction.toCharArray()) {
-                    if (!Character.isDigit(c) && "x+*-/^()sincoexpMath. ".indexOf(c) == -1) {
+                    if (!Character.isDigit(c) && "x+*-/^()sincoexp ".indexOf(c) == -1) {
                         System.out.println(Const.defaultValue + "Invalid character detected: " + c);
                         valid = 0;
                         break; // Exit the 'for' loop
@@ -88,6 +89,17 @@ public class Main {
                     System.out.println(Const.defaultValue + "That's not an integer. Please enter an integer.");
                 }
             } while (valid == 0);
+            System.out.println(Const.defaultValue + "Do you want twins? (y/n)");
+            do {
+                String twinsStr = scanner.nextLine();
+
+                if (twinsStr.equals("n")) {
+                    twins = false;
+                    break;
+                }
+                System.out.println(Const.defaultValue + "Please enter y or n");
+            } while (true);
+
 
             System.out.println(Const.defaultValue + "Using a population size of " + individualsNumber);
             System.out.println(Const.defaultValue + "Using the following fitness function: " + initialCustomFitnessFunction + "\n");
@@ -96,11 +108,24 @@ public class Main {
 
 
             Individuals[] pop = new Individuals[individualsNumber];
+            /*for (int i = 0; i < individualsNumber; i++) {
+                pop[i] = new Individuals(customFitnessFunction);
+                System.out.println(pop[i].getDecimalGenes() + " - " + pop[i].getBinaryGenes());
+            }*/
             for (int i = 0; i < individualsNumber; i++) {
                 pop[i] = new Individuals(customFitnessFunction);
-                //if (pop[i].getDecimalGenes() == 2){
-                System.out.println(pop[i].getDecimalGenes() + " - " + pop[i].getBinaryGenes());                    //System.out.println(pop[i].getFitness());
-                //}
+                for (int j = 0; j < i; j++) {
+                    if (pop[i].getDecimalGenes() == pop[j].getDecimalGenes()) {
+                        if (!twins) {
+                            System.out.println("doing first population");
+                            i--;
+                            break;
+                        } else {
+                            pop[i] = new Individuals(customFitnessFunction);
+                            j = -1;
+                        }
+                    }
+                }
             }
 
 
@@ -123,11 +148,10 @@ public class Main {
             } else {
                 System.out.println(Const.defaultValue + "The root of the function is: " + Individuals.findRoot(customFitnessFunction));
             }
-            while (pop[0].getFitness() != 0 && pop[1].getFitness() != 0 && counter[0] + counter[1] < 1000000) {
-                pop = evolution(pop, individualsNumber, counter, customFitnessFunction, numberGenes);
+            while (pop[0].getFitness() != 0 && pop[1].getFitness() != 0 && counter[0] + counter[1] < 100) {
+                pop = evolution(pop, individualsNumber, counter, customFitnessFunction, numberGenes, twins);
                 individualsNumber = 3;
             }
-
 
             System.out.println(Const.defaultValue + "The best individual is: " + pop[0].getDecimalGenes() + " and his fitness score is: "
                     + pop[0].getFitness());
@@ -139,24 +163,25 @@ public class Main {
         sc.close();
     }
 
-    public static Individuals[] evolution(Individuals[] pop, int individualsNumber, int[] counter, String customFitnessFunction, int number_mut) throws ScriptException {
+    public static Individuals[] evolution(Individuals[] pop, int individualsNumber, int[] counter, String customFitnessFunction, int number_mut, boolean twins) throws ScriptException {
         Individuals[] best = Selection.selection(pop, individualsNumber);
         Random rand = new Random();
         String newpop;
-        if (rand.nextInt(10) < (number_mut == 0 ? 0 : 3)) {
-            // System.out.println("Mutation");
-            newpop = Mutation.mutation(best[0].getBinaryGenes(), number_mut);
-//            System.out.println("Before: " + best[0].getBinaryGenes() + " After: " + newpop);
-            counter[0]++;
-        } else {
-            // System.out.println("Crossover");
-            newpop = Crossover.crossover(best[0].getBinaryGenes(), best[1].getBinaryGenes());
-            counter[1]++;
-        }
 
-        pop[0] = best[0];
-        pop[1] = best[1];
-        pop[2] = new Individuals(newpop, 2, customFitnessFunction);
+        do{
+            if (rand.nextInt(10) < (number_mut == 0 ? 0 : 3)) {
+                newpop = Mutation.mutation(best[0].getBinaryGenes(), number_mut);
+                counter[0]++;
+            } else {
+                newpop = Crossover.crossover(best[0].getBinaryGenes(), best[1].getBinaryGenes());
+                counter[1]++;
+            }
+
+            pop[0] = best[0];
+            pop[1] = best[1];
+            pop[2] = new Individuals(newpop, 2, customFitnessFunction);
+        }while (!twins && (pop[2].getDecimalGenes() == best[0].getDecimalGenes() || pop[2].getDecimalGenes() == best[1].getDecimalGenes()));
+
         return pop;
     }
 
