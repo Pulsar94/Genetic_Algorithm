@@ -78,11 +78,11 @@ public class Main {
                     System.out.println(Const.defaultValue + "Enter the number of genes to mutate or press " + Const.red + Const.underline + "Enter" + Const.defaultValue + " for default:");
                     if (scanner.hasNextInt()) {
                         numberGenes = scanner.nextInt();
-                        if (numberGenes > 8 || numberGenes < 1) {
+                        if (numberGenes > 8 || numberGenes < 0) {
                             System.out.println(Const.defaultValue + "The number of genes to mutate must be between 1 and 8. Please try again.");
                         }
                     }
-                } while (numberGenes < 1 || numberGenes > 8);
+                } while (numberGenes < 0 || numberGenes > 8);
             }
 
             System.out.println(Const.defaultValue + "Using a population size of " + individualsNumber);
@@ -139,10 +139,10 @@ public class Main {
         Individuals[] best = Selection.selection(pop, individualsNumber);
         Random rand = new Random();
         String newpop;
-        if (rand.nextInt(10) < 3) {
+        if (rand.nextInt(10) < (number_mut == 0 ? 0 : 3)) {
             // System.out.println("Mutation");
             newpop = Mutation.mutation(best[0].getBinaryGenes(), number_mut);
-            //System.out.println("Before: " + best[0].getBinaryGenes() + " After: " + newpop);
+//            System.out.println("Before: " + best[0].getBinaryGenes() + " After: " + newpop);
             counter[0]++;
         } else {
             // System.out.println("Crossover");
