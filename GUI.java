@@ -12,7 +12,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class GUI extends JFrame {
     private final JTextField nbpopTextField;
+    private final JTextField nbMutationTextField;
     private final JTextField initialCustomFitnessFunctionTextField;
+    private final JCheckBox avoidTwinsCheckBox;
     private JTable outputTable;
     private final DefaultTableModel tableModel;
     private int time = 2500;
@@ -20,6 +22,7 @@ public class GUI extends JFrame {
     boolean crossover = false;
     private Individuals[] pop;
     private int individualsNumber;
+    private int mutationNumner;
     private String customFitnessFunction;
     private DefaultTableModel model;
     private int[] counter = {0, 0};
@@ -34,12 +37,11 @@ public class GUI extends JFrame {
     }
 
     public GUI() {
-        setBounds(700, 150, 600, 900);
+        setBounds(700, 150, 700, 480);
         setTitle("Genetic Algorithm");
         try {
             // Initialize an Image object with the path to your icon
             Image icon = Toolkit.getDefaultToolkit().getImage("pngtree-dna-icon-design-png-image_1499059.jpg");
-
             // Set the window icon
             setIconImage(icon);
         } catch (Exception e) {
@@ -50,20 +52,33 @@ public class GUI extends JFrame {
         setLayout(new FlowLayout());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        setPreferredSize(new Dimension(600, 825));
+        setPreferredSize(new Dimension(700, 480));
         setResizable(false);
 
         // Add components for nbpop
-        add(new JLabel("Enter nbpop:"));
-        nbpopTextField = new JTextField(10);
+        add(new JLabel("Enter the number of individuals:"));
+        nbpopTextField = new JTextField(2);
         add(nbpopTextField);
         nbpopTextField.setText("15");
 
         // Add components for initialCustomFunction
-        add(new JLabel("Enter initialCustomFunction:"));
-        initialCustomFitnessFunctionTextField = new JTextField(10);
+        add(new JLabel("Enter the Fitness Function:"));
+        initialCustomFitnessFunctionTextField = new JTextField(7);
         add(initialCustomFitnessFunctionTextField);
         initialCustomFitnessFunctionTextField.setText("(x + 3)^2 - 25");
+
+        // Add components for nbpop
+        add(new JLabel("Enter the number of mutation:"));
+        nbMutationTextField = new JTextField(1);
+        add(nbMutationTextField);
+        nbMutationTextField.setText("1");
+
+        // Add components for twins
+        //add(new JLabel("Avoid twins:"));
+        avoidTwinsCheckBox = new JCheckBox();
+        //add(avoidTwinsCheckBox);
+        avoidTwinsCheckBox.setSelected(true);
+
 
         // Add a button to generate the initial population
         JButton generateButton = new JButton("Start");
@@ -134,7 +149,7 @@ public class GUI extends JFrame {
 
         //region table
         outputTable.setFont(new Font("Monospaced", Font.BOLD, 14));
-        outputTable.setSize(523, 700);
+        outputTable.setSize(653, 323);
         outputTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         outputTable.setDragEnabled(false);
         outputTable.setRowSelectionAllowed(false);
@@ -160,7 +175,7 @@ public class GUI extends JFrame {
                 JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED  // Enable horizontal scrollbar when needed
         );
         getContentPane().add(scrollPane);
-        scrollPane.setPreferredSize(new Dimension(533, 700));
+        scrollPane.setPreferredSize(new Dimension(653, 323));
 
         // Applying the custom cell renderer to your JTable
 
@@ -168,14 +183,14 @@ public class GUI extends JFrame {
         outputTable.getColumnModel().getColumn(0).setPreferredWidth(75);
         outputTable.getColumnModel().getColumn(1).setPreferredWidth(55);
         outputTable.getColumnModel().getColumn(2).setPreferredWidth(80);
-        outputTable.getColumnModel().getColumn(3).setPreferredWidth(40);
-        outputTable.getColumnModel().getColumn(4).setPreferredWidth(40);
-        outputTable.getColumnModel().getColumn(5).setPreferredWidth(40);
-        outputTable.getColumnModel().getColumn(6).setPreferredWidth(40);
-        outputTable.getColumnModel().getColumn(7).setPreferredWidth(40);
-        outputTable.getColumnModel().getColumn(8).setPreferredWidth(40);
-        outputTable.getColumnModel().getColumn(9).setPreferredWidth(40);
-        outputTable.getColumnModel().getColumn(10).setPreferredWidth(40);
+        outputTable.getColumnModel().getColumn(3).setPreferredWidth(55);
+        outputTable.getColumnModel().getColumn(4).setPreferredWidth(55);
+        outputTable.getColumnModel().getColumn(5).setPreferredWidth(55);
+        outputTable.getColumnModel().getColumn(6).setPreferredWidth(55);
+        outputTable.getColumnModel().getColumn(7).setPreferredWidth(55);
+        outputTable.getColumnModel().getColumn(8).setPreferredWidth(55);
+        outputTable.getColumnModel().getColumn(9).setPreferredWidth(55);
+        outputTable.getColumnModel().getColumn(10).setPreferredWidth(55);
 
         outputTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
         outputTable.repaint();
@@ -220,6 +235,7 @@ public class GUI extends JFrame {
         applyCustomRenderer = false;
 
         individualsNumber = Integer.parseInt(nbpopTextField.getText());
+        mutationNumner = Integer.parseInt(nbMutationTextField.getText());
         String initialCustomFitnessFunction = initialCustomFitnessFunctionTextField.getText();
         if (initialCustomFitnessFunction.contains("^")) {
             customFitnessFunction = Main.reformat(initialCustomFitnessFunction);
@@ -275,8 +291,8 @@ public class GUI extends JFrame {
                 crossoverRowData[0] = "M" + counter[0];
                 crossover = false;
                 try {
-                    pop[2] = new Individuals(Mutation.mutation(best[0].getBinaryGenes(), 2), 2,customFitnessFunction);
-                    System.out.println("Mutations index : "+Mutation.bitMutated[0] + ";" + Mutation.bitMutated[1]);
+                    pop[2] = new Individuals(Mutation.mutation(best[0].getBinaryGenes(), mutationNumner), 2,customFitnessFunction);
+                    //System.out.println("Mutations index : "+Mutation.bitMutated[0] + ";" + Mutation.bitMutated[1]);
                 } catch (ScriptException ex) {
                     throw new RuntimeException(ex);
                 }
