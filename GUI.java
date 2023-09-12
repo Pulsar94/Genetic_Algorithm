@@ -6,6 +6,7 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -410,9 +411,11 @@ public class GUI extends JFrame {
                     StringBuilder coloredString = new StringBuilder();
                     int start = 0;
 
+                    Arrays.sort(Mutation.bitMutated);
                     for (int mutatedIndex : Mutation.bitMutated) {
                         // Make sure the index is within range before accessing binaryString
                         if (mutatedIndex >= 0 && mutatedIndex < binaryString.length()) {
+
                             String pre = binaryString.substring(start, mutatedIndex);
                             String mutatedBit = binaryString.substring(mutatedIndex, mutatedIndex + 1);
                             coloredString.append("<font color='black'>").append(pre).append("</font>");

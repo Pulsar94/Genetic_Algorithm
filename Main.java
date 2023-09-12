@@ -1,11 +1,11 @@
 import javax.script.ScriptException;
+import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
     public static void main(String[] args) throws ScriptException {
         Scanner sc = new Scanner(System.in);
-
         System.out.println(Const.defaultValue + Const.bold + "Welcome to the Genetic Algorithm program");
         System.out.println(Const.defaultValue + "Press " + Const.red + Const.underline + "Enter\033[0m" + Const.defaultValue + " to continue");
         sc.nextLine();
@@ -119,7 +119,7 @@ public class Main {
             } else {
                 System.out.println(Const.defaultValue + "The root of the function is: " + Individuals.findRoot(customFitnessFunction));
             }
-            while (pop[0].getFitness() != 0 && pop[1].getFitness() != 0 && counter[0] + counter[1] < 1000000) {
+            while (pop[0].getFitness() != 0 && pop[1].getFitness() != 0 && counter[0] + counter[1] < 10000000) {
                 pop = evolution(pop, individualsNumber, counter, customFitnessFunction, numberGenes);
                 individualsNumber = 3;
             }
@@ -139,7 +139,7 @@ public class Main {
         Individuals[] best = Selection.selection(pop, individualsNumber);
         Random rand = new Random();
         String newpop;
-        if (rand.nextInt(10) < (number_mut == 0 ? 0 : 3)) {
+        if (rand.nextInt(10) < (number_mut == 0 ? 0 : 10)) {
             // System.out.println("Mutation");
             newpop = Mutation.mutation(best[0].getBinaryGenes(), number_mut);
 //            System.out.println("Before: " + best[0].getBinaryGenes() + " After: " + newpop);
