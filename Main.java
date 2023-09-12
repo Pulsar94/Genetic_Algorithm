@@ -1,5 +1,4 @@
 import javax.script.ScriptException;
-import java.util.Arrays;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -159,10 +158,6 @@ public class Main {
         pop[1] = best[1];
         pop[2] = new Individuals(newpop, 2, customFitnessFunction);
         return pop;
-        //if (pop[2].getDecimalGenes() == 2){
-            //System.out.println(pop[2].getDecimalGenes());
-            //System.out.println(pop[2].getFitness());
-        //}
     }
 
 
@@ -172,7 +167,7 @@ public class Main {
         function = function.replaceAll(regexPow, "Math.pow($1, $2)");
 
         // Replace sin()
-        String regexSin = "\\s*sin\\(\\s*([^\\)]+)\\s*\\)\\s*";
+        String regexSin = "\\s*sin\\(\\s*([^\\r)]+)\\s*\\)\\s*";
         function = function.replaceAll(regexSin, "Math.sin($1)");
 
         // Replace cos()

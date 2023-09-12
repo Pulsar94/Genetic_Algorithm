@@ -2,8 +2,6 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.Random;
-import java.util.Scanner;
-import java.util.function.Function;
 
 public class Individuals {
     private static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
@@ -33,10 +31,6 @@ public class Individuals {
     private void evaluateFitness() throws ScriptException {
         synchronized(engine) {
             engine.put("x", getDecimalGenes());
-            //if(engine.eval(String.format("Math.floor(%s)", fitnessFunction)) instanceof Integer){
-              //  setFitness((Integer) engine.eval(String.format("Math.floor(%s)", fitnessFunction)));
-            //}
-            //Object result = engine.eval(String.format("Math.floor(%s)", fitnessFunction));
             setFitness(engine.eval(String.format("Math.floor(%s)", fitnessFunction)) instanceof Integer ? (Integer) engine.eval(String.format("Math.floor(%s)", fitnessFunction)) : ((Double) engine.eval(String.format("Math.floor(%s)", fitnessFunction))).intValue());
         }
     }
@@ -75,11 +69,11 @@ public class Individuals {
     }
 
     public String getBinaryGenes() {
-        String binaryGenes = Integer.toBinaryString(decimalGenes);
+        StringBuilder binaryGenes = new StringBuilder(Integer.toBinaryString(decimalGenes));
         for (int i = binaryGenes.length(); i < 8; i++) {
-            binaryGenes = "0" + binaryGenes;
+            binaryGenes.insert(0, "0");
         }
-        return binaryGenes;
+        return binaryGenes.toString();
     }
 
     public int[] getArrayGenes() {

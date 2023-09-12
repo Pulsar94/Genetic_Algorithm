@@ -4,13 +4,12 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 public class GUI extends JFrame {
+    //region attributes
     private final JTextField nbpopTextField;
     private final JTextField nbMutationTextField;
     private final JTextField initialCustomFitnessFunctionTextField;
@@ -26,14 +25,11 @@ public class GUI extends JFrame {
     private String customFitnessFunction;
     private DefaultTableModel model;
     private int[] counter = {0, 0};
+    //endregion
 
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(new Runnable() {
-            public void run() {
-                new GUI();
-            }
-        });
+        SwingUtilities.invokeLater(GUI::new);
     }
 
     public GUI() {
@@ -84,16 +80,12 @@ public class GUI extends JFrame {
         JButton generateButton = new JButton("Start");
         add(generateButton);
 
-        MyCellRenderer myCellRenderer = new MyCellRenderer();
-
-        generateButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    counter = new int[]{0, 0};
-                    generateInitialPopulation();
-                } catch (ScriptException ex) {
-                    throw new RuntimeException(ex);
-                }
+        generateButton.addActionListener(e -> {
+            try {
+                counter = new int[]{0, 0};
+                generateInitialPopulation();
+            } catch (ScriptException ex) {
+                throw new RuntimeException(ex);
             }
         });
 
@@ -198,11 +190,7 @@ public class GUI extends JFrame {
         //add a next button
         JButton nextButton = new JButton("Next");
         add(nextButton);
-        nextButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                evolvingPopulation();
-            }
-        });
+        nextButton.addActionListener(e -> evolvingPopulation());
         nextButton.addActionListener(e -> {
             // Set your custom cell renderer here
             outputTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
@@ -210,13 +198,11 @@ public class GUI extends JFrame {
 
         JButton skipButton = new JButton("Skip");
         add(skipButton);
-        skipButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    evolvedPopulation();
-                } catch (ScriptException ex) {
-                    throw new RuntimeException(ex);
-                }
+        skipButton.addActionListener(e -> {
+            try {
+                evolvedPopulation();
+            } catch (ScriptException ex) {
+                throw new RuntimeException(ex);
             }
         });
         skipButton.addActionListener(e -> {
@@ -320,11 +306,9 @@ public class GUI extends JFrame {
             ((Timer)e.getSource()).stop();  // Stop the initial delay timer
         }).start();
 
-        new Timer(time + 500 + 200* individualsNumber, new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                applyCustomRenderer = true;
-                ((Timer)e.getSource()).stop();
-            }
+        new Timer(time + 500 + 200* individualsNumber, e -> {
+            applyCustomRenderer = true;
+            ((Timer)e.getSource()).stop();
         }).start();
         time = 0;
 
@@ -355,10 +339,7 @@ public class GUI extends JFrame {
 
     }
 
-
-    Timer animationTimer;
-    Individuals[] targetState;
-
+    /** To get the two best individuals*/
     private void getTwoBestIndividuals() {
         Individuals[] best = Selection.selection(pop, pop.length);
         System.out.println(best[0].getDecimalGenes()+"    "+best[1].getDecimalGenes());
@@ -384,7 +365,7 @@ public class GUI extends JFrame {
             } else {
                 if((Integer)tableModel.getValueAt(0, 1) != best[0].getDecimalGenes()){  //exchange the two first rows
                     Object[] exchangeRowData = new Object[11];
-                    exchangeRowData[0] = tableModel.getValueAt(0,0);;
+                    exchangeRowData[0] = tableModel.getValueAt(0,0);
                     exchangeRowData[1] = best[1].getDecimalGenes();
                     exchangeRowData[2] = best[1].getBinaryGenes();
                     for (int j = 3; j <= 10; j++) {
@@ -446,7 +427,7 @@ public class GUI extends JFrame {
                         coloredString.append("<font color='black'>").append(post).append("</font>");
                     }
 
-                    setText("<html>" + coloredString.toString() + "</html>");
+                    setText("<html>" + coloredString + "</html>");
                 }
             }
             return c;
