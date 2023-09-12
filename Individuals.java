@@ -33,8 +33,11 @@ public class Individuals {
     private void evaluateFitness() throws ScriptException {
         synchronized(engine) {
             engine.put("x", getDecimalGenes());
-            Double result = (Double) engine.eval(String.format("Math.floor(%s)", fitnessFunction));
-            setFitness(result.intValue());
+            //if(engine.eval(String.format("Math.floor(%s)", fitnessFunction)) instanceof Integer){
+              //  setFitness((Integer) engine.eval(String.format("Math.floor(%s)", fitnessFunction)));
+            //}
+            //Object result = engine.eval(String.format("Math.floor(%s)", fitnessFunction));
+            setFitness(engine.eval(String.format("Math.floor(%s)", fitnessFunction)) instanceof Integer ? (Integer) engine.eval(String.format("Math.floor(%s)", fitnessFunction)) : ((Double) engine.eval(String.format("Math.floor(%s)", fitnessFunction))).intValue());
         }
     }
 

@@ -1,12 +1,13 @@
 import java.util.Random;
 
 public class Mutation {
-    public String mutation(String old_sequence, int number_mut){
+    public static String mutation(String old_sequence, int number_mut){
         Random rand = new Random(); // Initialization of the object random
         String[] little_seq; // Initialization of an array of string
         StringBuilder seq_mutated = new StringBuilder(); // The sequence mutated, to which we can append character at the end
         int count_mut = 0; // count of mutation in progress
         little_seq = old_sequence.split(""); // split the string in argument in an array of string
+        //System.out.println("The sequence to mutate is: " + old_sequence);
 
         for (String i:little_seq) {
             int int_random = rand.nextInt(2); // random number between 0 and 1
@@ -22,6 +23,7 @@ public class Mutation {
             }
             seq_mutated.append(i); // add every genes in the sequence mutated
         }
+        //System.out.println("The sequence mutated is: " + seq_mutated.toString());
         return seq_mutated.toString(); // convert the StringBuilder to a string
     }
 }
