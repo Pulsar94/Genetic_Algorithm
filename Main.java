@@ -3,15 +3,25 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class Main {
+    /**
+     * Main method to execute the Genetic Algorithm program.
+     *
+     * @param args Command-line arguments (not used).
+     * @throws ScriptException If a script error occurs.
+     */
     public static void main(String[] args) throws ScriptException {
+
+        //region Initialization
         Scanner sc = new Scanner(System.in);
         System.out.println(Const.defaultValue + Const.bold + "Welcome to the Genetic Algorithm program");
         System.out.println(Const.defaultValue + "Press " + Const.red + Const.underline + "Enter\033[0m" + Const.defaultValue + " to continue");
         sc.nextLine();
+        //endregion
+
         do {
+            //region Individuals Number Input
             System.out.println(Const.defaultValue + "Enter the number of individuals in the population or press " + Const.red + Const.underline + "Enter\033[0m" + Const.defaultValue + " for default (15):");
 
-            // Handling individualsNumber
             int valid = 0;
             int individualsNumber = -1; // Initialize to an invalid value
 
@@ -34,16 +44,14 @@ public class Main {
                     System.out.println(Const.defaultValue + "That's not an integer. Please enter an integer.");
                 }
             } while (valid == 0);
+            //endregion
 
-
+            //region Custom Fitness Function Input
             String initialCustomFitnessFunction;
             String customFitnessFunction;
 
-
             Scanner scanner = new Scanner(System.in);
             valid = 0;
-
-            // To choose fitness function
             System.out.println(Const.defaultValue + "Enter your custom fitness function using 'x' as the variable [e.g., (x + 3)^2 - 25] or press " + Const.red + Const.underline + "Enter" + Const.defaultValue + " for default:");
             do {
                 initialCustomFitnessFunction = scanner.nextLine();
@@ -68,7 +76,9 @@ public class Main {
                 }
 
             } while (valid == 0);
+            //endregion
 
+            //region Number of Genes to Mutate Input
             int numberGenes = 1;
             System.out.println(Const.defaultValue + "Enter the number of genes to mutate or press " + Const.red + Const.underline + "Enter" + Const.defaultValue + " for default (1):");
             do {
@@ -88,68 +98,83 @@ public class Main {
                     System.out.println(Const.defaultValue + "That's not an integer. Please enter an integer.");
                 }
             } while (valid == 0);
+            //endregion
 
+            //region Initial Display
             System.out.println(Const.defaultValue + "Using a population size of " + individualsNumber);
             System.out.println(Const.defaultValue + "Using the following fitness function: " + initialCustomFitnessFunction + "\n");
 
+            // Reformat the custom fitness function for evaluation
             customFitnessFunction = reformat(initialCustomFitnessFunction);
 
-
+            // Create an array of Individuals with binary genes
             Individuals[] pop = new Individuals[individualsNumber];
             for (int i = 0; i < individualsNumber; i++) {
                 pop[i] = new Individuals(customFitnessFunction);
-                //if (pop[i].getDecimalGenes() == 2){
-                System.out.println(pop[i].getDecimalGenes() + " - " + pop[i].getBinaryGenes());                    //System.out.println(pop[i].getFitness());
-                //}
+                System.out.println(pop[i].getDecimalGenes() + " - " + pop[i].getBinaryGenes());
             }
+            //endregion
 
-
-
+            //region Evolution
+            // Initialize variables for genetic algorithm
             Individuals[] best;
             int[] counter = {0, 0};
 
+            // Perform initial selection
             best = Selection.selection(pop, individualsNumber);
 
-            //use the newton algorithm to find the root of the function
+            // Use the Newton algorithm to find the root of the function
             if (best[0].getFitness() == 0) {
                 System.out.println(Const.defaultValue + "The best individual is: " + best[0].getDecimalGenes() + " and his fitness score is: "
                         + best[0].getFitness());
                 System.exit(0);
             }
 
-
+            // Check if a root exists for the fitness function
             if (Individuals.findRoot(customFitnessFunction) == null) {
                 System.out.println(Const.defaultValue + "There is no root found for the following function between 0 and 255\nf(x) -> " + initialCustomFitnessFunction);
             } else {
                 System.out.println(Const.defaultValue + "The root of the function is: " + Individuals.findRoot(customFitnessFunction));
             }
+
+            // Run the genetic algorithm until a termination condition is met
             while (pop[0].getFitness() != 0 && pop[1].getFitness() != 0 && counter[0] + counter[1] < 1000000) {
                 pop = evolution(pop, individualsNumber, counter, customFitnessFunction, numberGenes);
                 individualsNumber = 3;
             }
+            //endregion
 
-
+            // Print results
             System.out.println(Const.defaultValue + "The best individual is: " + pop[0].getDecimalGenes() + " and his fitness score is: "
                     + pop[0].getFitness());
             System.out.println(Const.defaultValue + "The number of mutation is: " + counter[0]);
             System.out.println(Const.defaultValue + "The number of crossover is: " + counter[1]);
             System.out.println(Const.defaultValue + "\nPress " + Const.red + Const.underline + "Enter" + Const.defaultValue + " to continue or press " + Const.red + Const.underline + "0" + Const.defaultValue + " to exit");
+
         } while (sc.nextLine().isEmpty());
 
         sc.close();
     }
 
+    /**
+     * Perform evolution (mutation or crossover) on the population.
+     *
+     * @param pop                  The population of Individuals.
+     * @param individualsNumber    The number of individuals in the population.
+     * @param counter              An array to count mutation and crossover operations.
+     * @param customFitnessFunction The custom fitness function.
+     * @param number_mut           The number of genes to mutate.
+     * @return The updated population of Individuals.
+     * @throws ScriptException If a script error occurs.
+     */
     public static Individuals[] evolution(Individuals[] pop, int individualsNumber, int[] counter, String customFitnessFunction, int number_mut) throws ScriptException {
         Individuals[] best = Selection.selection(pop, individualsNumber);
         Random rand = new Random();
         String newpop;
         if (rand.nextInt(10) < (number_mut == 0 ? 0 : 3)) {
-            // System.out.println("Mutation");
             newpop = Mutation.mutation(best[0].getBinaryGenes(), number_mut);
-//            System.out.println("Before: " + best[0].getBinaryGenes() + " After: " + newpop);
             counter[0]++;
         } else {
-            // System.out.println("Crossover");
             newpop = Crossover.crossover(best[0].getBinaryGenes(), best[1].getBinaryGenes());
             counter[1]++;
         }
@@ -160,7 +185,12 @@ public class Main {
         return pop;
     }
 
-
+    /**
+     * Reformat the custom fitness function by replacing mathematical operators and functions with Java-compatible ones.
+     *
+     * @param function The custom fitness function as a string.
+     * @return The reformatted fitness function.
+     */
     public static String reformat(String function) {
         // Replace ^ with Math.pow
         String regexPow = "\\s*([\\w\\s+\\-*/()]+)\\s*\\^\\s*(\\d+)\\s*";
