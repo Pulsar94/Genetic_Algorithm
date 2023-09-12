@@ -1,6 +1,9 @@
 .idea/
 out/
 
+# Run file
+*.bat
+
 # Compiled class file
 *.class
 
