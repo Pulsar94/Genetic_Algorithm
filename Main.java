@@ -94,7 +94,9 @@ public class Main {
             Individuals[] pop = new Individuals[individualsNumber];
             for (int i = 0; i < individualsNumber; i++) {
                 pop[i] = new Individuals(customFitnessFunction);
-                System.out.println(pop[i].getDecimalGenes() + " - " + pop[i].getBinaryGenes());
+                //if (pop[i].getDecimalGenes() == 2){
+                System.out.println(pop[i].getDecimalGenes() + " - " + pop[i].getBinaryGenes());                    //System.out.println(pop[i].getFitness());
+                //}
             }
 
 
@@ -133,14 +135,14 @@ public class Main {
         sc.close();
     }
 
-    public static Individuals[] evolution(Individuals[] pop, int individualsNumber, int[] counter, String customFitnessFunction, int numberGenes) throws ScriptException {
+    public static Individuals[] evolution(Individuals[] pop, int individualsNumber, int[] counter, String customFitnessFunction, int number_mut) throws ScriptException {
         Individuals[] best = Selection.selection(pop, individualsNumber);
         Random rand = new Random();
         String newpop;
         if (rand.nextInt(10) < 3) {
             // System.out.println("Mutation");
-            newpop = Mutation.mutation(best[0].getBinaryGenes(), numberGenes);
-//            System.out.println("Before: " + best[0].getBinaryGenes() + " After: " + newpop);
+            newpop = Mutation.mutation(best[0].getBinaryGenes(), number_mut);
+            //System.out.println("Before: " + best[0].getBinaryGenes() + " After: " + newpop);
             counter[0]++;
         } else {
             // System.out.println("Crossover");

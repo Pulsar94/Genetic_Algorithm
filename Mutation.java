@@ -3,6 +3,7 @@ import java.util.Random;
 public class Mutation {
     public static int[] bitMutated;
     public static String mutation(String oldSequence, int number_mut){
+        System.out.println("old sequence :"+oldSequence);
         bitMutated = new int[number_mut];
         Random rand = new Random(); // Initialization of the object random
         bitMutated[0] = rand.nextInt(oldSequence.length()); // random number between 0 and the length of the sequence
@@ -19,6 +20,7 @@ public class Mutation {
         for (int bit:bitMutated) {
             newSequence = oldSequence.substring(0, bitMutated[0]) + (oldSequence.charAt(bitMutated[0]) == '0' ? '1' : '0') + oldSequence.substring(bitMutated[0] + 1); // replace the bit at the position bitMutated by the opposite
         }
+        System.out.println("new sequence :"+newSequence);
         return newSequence;
 
 

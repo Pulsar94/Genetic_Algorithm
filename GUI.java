@@ -6,8 +6,6 @@ import javax.swing.table.TableCellRenderer;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -15,9 +13,16 @@ public class GUI extends JFrame {
     private final JTextField nbpopTextField;
     private final JTextField initialCustomFitnessFunctionTextField;
     private JTable outputTable;
-    DefaultTableModel tableModel;
-    private Timer timer;
-    boolean applyCustomRenderer = false;  // Instance variable
+    private final DefaultTableModel tableModel;
+    private int time = 2500;
+    boolean applyCustomRenderer = false;
+    boolean crossover = false;
+    private Individuals[] pop;
+    private int individualsNumber;
+    private String customFitnessFunction;
+    private DefaultTableModel model;
+    private int[] counter = {0, 0};
+
 
     public static void main(String[] args) {
         SwingUtilities.invokeLater(new Runnable() {
@@ -28,7 +33,7 @@ public class GUI extends JFrame {
     }
 
     public GUI() {
-        setBounds(0, 0, 600, 800);
+        setBounds(700, 150, 600, 900);
         setTitle("Genetic Algorithm");
         try {
             // Initialize an Image object with the path to your icon
@@ -44,7 +49,7 @@ public class GUI extends JFrame {
         setLayout(new FlowLayout());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        setPreferredSize(new Dimension(600, 800));
+        setPreferredSize(new Dimension(600, 825));
         setResizable(false);
 
         // Add components for nbpop
@@ -68,6 +73,7 @@ public class GUI extends JFrame {
         generateButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 try {
+                    counter = new int[]{0, 0};
                     generateInitialPopulation();
                 } catch (ScriptException ex) {
                     throw new RuntimeException(ex);
@@ -96,15 +102,28 @@ public class GUI extends JFrame {
                 Component c = super.prepareRenderer(renderer, row, column);
 
                 if (applyCustomRenderer) {
-                    if (row == 0) { // Replace with your own conditions
-                        return new MyCellRenderer().getTableCellRendererComponent(this, getModel().getValueAt(row, column),
-                                isCellSelected(row, column), false, row, column, 0);
-                    } else if (row == 1) {
-                        return new MyCellRenderer().getTableCellRendererComponent(this, getModel().getValueAt(row, column),
-                                isCellSelected(row, column), false, row, column, 1);
-                    } else if(row == 2){
-                        return new MyCellRenderer().getTableCellRendererComponent(this, getModel().getValueAt(row, column),
-                                isCellSelected(row, column), false, row, column, 2);
+                    if(crossover) {
+                        if (row == 0) { // Replace with your own conditions
+                            return new MyCellRenderer().getTableCellRendererComponent(this, getModel().getValueAt(row, column),
+                                    isCellSelected(row, column), false, row, column, 0);
+                        } else if (row == 1) {
+                            return new MyCellRenderer().getTableCellRendererComponent(this, getModel().getValueAt(row, column),
+                                    isCellSelected(row, column), false, row, column, 1);
+                        } else if (row == 2) {
+                            return new MyCellRenderer().getTableCellRendererComponent(this, getModel().getValueAt(row, column),
+                                    isCellSelected(row, column), false, row, column, 2);
+                        }
+                    }else {
+                        if (row == 0) { // Replace with your own conditions
+                            return new MyCellRenderer().getTableCellRendererComponent(this, getModel().getValueAt(row, column),
+                                    isCellSelected(row, column), false, row, column, 10);
+                        }else if (row == 1) {
+                            return new MyCellRenderer().getTableCellRendererComponent(this, getModel().getValueAt(row, column),
+                                    isCellSelected(row, column), false, row, column, 11);
+                        }else if (row == 2) {
+                            return new MyCellRenderer().getTableCellRendererComponent(this, getModel().getValueAt(row, column),
+                                    isCellSelected(row, column), false, row, column, 12);
+                        }
                     }
                 }
 
@@ -112,6 +131,7 @@ public class GUI extends JFrame {
             }
         };
 
+        //region table
         outputTable.setFont(new Font("Monospaced", Font.BOLD, 14));
         outputTable.setSize(523, 700);
         outputTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -121,10 +141,11 @@ public class GUI extends JFrame {
         outputTable.setShowGrid(true);
         outputTable.setGridColor(Color.BLACK);
         outputTable.setRowHeight(20);
+        //endregion
 
 
 
-        DefaultTableModel model = new DefaultTableModel(columnNames, 0); // 0 means no rows initially
+        model = new DefaultTableModel(columnNames, 0); // 0 means no rows initially
         outputTable.setModel(model);
 
         tableModel = new DefaultTableModel(columnNames, 0);
@@ -158,6 +179,36 @@ public class GUI extends JFrame {
         outputTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
         outputTable.repaint();
 
+        //add a next button
+        JButton nextButton = new JButton("Next");
+        add(nextButton);
+        nextButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                evolvingPopulation();
+            }
+        });
+        nextButton.addActionListener(e -> {
+            // Set your custom cell renderer here
+            outputTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
+        });
+
+        JButton skipButton = new JButton("Skip");
+        add(skipButton);
+        skipButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    evolvedPopulation();
+                } catch (ScriptException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
+        skipButton.addActionListener(e -> {
+            // Set your custom cell renderer here
+            outputTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
+        });
+
+
 
         pack();
         setVisible(true);
@@ -167,25 +218,24 @@ public class GUI extends JFrame {
     private void generateInitialPopulation() throws ScriptException {
         applyCustomRenderer = false;
 
-        int individualsNumbers = Integer.parseInt(nbpopTextField.getText());
+        individualsNumber = Integer.parseInt(nbpopTextField.getText());
         String initialCustomFitnessFunction = initialCustomFitnessFunctionTextField.getText();
-        String customFitnessFunction;
         if (initialCustomFitnessFunction.contains("^")) {
             customFitnessFunction = Main.reformat(initialCustomFitnessFunction);
         } else {
             customFitnessFunction = initialCustomFitnessFunction;
         }
 
-        Individuals[] pop = new Individuals[individualsNumbers];
-        for (int i = 0; i < individualsNumbers; i++) {
+        pop = new Individuals[individualsNumber];
+        for (int i = 0; i < individualsNumber; i++) {
             pop[i] = new Individuals(customFitnessFunction);
             //System.out.println(pop[i].getDecimalGenes());
         }
 
-        DefaultTableModel model = (DefaultTableModel) outputTable.getModel();
+        model = (DefaultTableModel) outputTable.getModel();
         model.setRowCount(0); // Clear existing rows
 
-        for (int i = 0; i < individualsNumbers; i++) {
+        for (int i = 0; i < individualsNumber; i++) {
 
             String binaryString = pop[i].getBinaryGenes();
             Object[] rowData = new Object[11];
@@ -200,56 +250,91 @@ public class GUI extends JFrame {
             }
 
             model.addRow(rowData);
-        }
 
-        Timer timer = new Timer(2000, e -> {
-            //updateAndSortTable(pop);
-            //animateTableSorting(pop);
-            getTwoBestIndividuals(pop);
+        }
+        evolvingPopulation();
+    }
+
+    private void evolvingPopulation() {
+        Timer timer = new Timer(time-500, e -> {
+
+            getTwoBestIndividuals();
             ((Timer)e.getSource()).stop();  // Stop the timer
         });
         timer.start();
 
-        new Timer(3000 + 200*individualsNumbers, e -> {
+        new Timer(time + 500 + 200* individualsNumber, e -> {
             // Adding the crossover row
-            Individuals Result = null;
-            Individuals[] best = Selection.selection(pop, pop.length);
+            Individuals[] best = Selection.selection(pop, individualsNumber);
+            Object[] crossoverRowData = new Object[11];
+
             Random rand = new Random();
             if (rand.nextInt(10) < 3) {
-                System.out.println("Mutation");
+                counter[0]++;
+                crossoverRowData[0] = "M" + counter[0];
+                crossover = false;
                 try {
-                    Result = new Individuals(Mutation.mutation(best[0].getBinaryGenes(), 1), 2,customFitnessFunction);
+                    pop[2] = new Individuals(Mutation.mutation(best[0].getBinaryGenes(), 2), 2,customFitnessFunction);
+                    System.out.println("Mutations index : "+Mutation.bitMutated[0] + ";" + Mutation.bitMutated[1]);
                 } catch (ScriptException ex) {
                     throw new RuntimeException(ex);
                 }
             } else {
-                System.out.println("Crossover");
+                counter[1]++;
+                crossoverRowData[0] = "C" + counter[1];
+                crossover = true;
                 try {
-                    Result = new Individuals(Crossover.crossover(best[0].getBinaryGenes(), best[1].getBinaryGenes()), 2,customFitnessFunction);
+                    pop[2] = new Individuals(Crossover.crossover(best[0].getBinaryGenes(), best[1].getBinaryGenes()), 2,customFitnessFunction);
                 } catch (ScriptException ex) {
                     throw new RuntimeException(ex);
                 }
-                System.out.println(Result.getBinaryGenes());
+                System.out.println(pop[2].getBinaryGenes());
             }
-
-            Object[] crossoverRowData = new Object[11];
-            crossoverRowData[0] = "Crossover";
-            crossoverRowData[1] = Result.getDecimalGenes();
-            crossoverRowData[2] = Result.getBinaryGenes();
-            int[] crossoverGenes = Result.getArrayGenes();
+            pop[0] = best[0];
+            pop[1] = best[1];
+            individualsNumber = 3;
+            crossoverRowData[1] = pop[2].getDecimalGenes();
+            crossoverRowData[2] = pop[2].getBinaryGenes();
+            int[] crossoverGenes = pop[2].getArrayGenes();
             for (int j = 3; j <= 10; j++) {
                 crossoverRowData[j] = crossoverGenes[j - 3];
             }
             model.addRow(crossoverRowData);
-        ((Timer)e.getSource()).stop();  // Stop the initial delay timer
+            ((Timer)e.getSource()).stop();  // Stop the initial delay timer
         }).start();
 
-        new Timer(3000 + 200*individualsNumbers, new ActionListener() {
+        new Timer(time + 500 + 200* individualsNumber, new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 applyCustomRenderer = true;
                 ((Timer)e.getSource()).stop();
             }
         }).start();
+        time = 0;
+
+    }
+    private void evolvedPopulation() throws ScriptException {
+        model.setRowCount(0); // Clear existing rows
+        while (pop[0].getFitness() != 0 && pop[1].getFitness() != 0 && counter[0] + counter[1] < 1000000) {
+            pop = Main.evolution(pop, individualsNumber, counter, customFitnessFunction, 1);
+            individualsNumber = 3;
+        }
+        Object[] crossoverRowData = new Object[11];
+        crossoverRowData[0] = "Best 1";
+        crossoverRowData[1] = pop[0].getDecimalGenes();
+        crossoverRowData[2] = pop[0].getBinaryGenes();
+        int[] crossoverGenes = pop[0].getArrayGenes();
+        for (int j = 3; j <= 10; j++) {
+            crossoverRowData[j] = crossoverGenes[j - 3];
+        }
+        model.addRow(crossoverRowData);
+        crossoverRowData[0] = "Best 2";
+        crossoverRowData[1] = pop[1].getDecimalGenes();
+        crossoverRowData[2] = pop[1].getBinaryGenes();
+        crossoverGenes = pop[1].getArrayGenes();
+        for (int j = 3; j <= 10; j++) {
+            crossoverRowData[j] = crossoverGenes[j - 3];
+        }
+        model.addRow(crossoverRowData);
 
     }
 
@@ -257,14 +342,14 @@ public class GUI extends JFrame {
     Timer animationTimer;
     Individuals[] targetState;
 
-    private void getTwoBestIndividuals(Individuals[] pop) {
+    private void getTwoBestIndividuals() {
         Individuals[] best = Selection.selection(pop, pop.length);
         System.out.println(best[0].getDecimalGenes()+"    "+best[1].getDecimalGenes());
         AtomicInteger nbBest0 = new AtomicInteger();
         AtomicInteger nbBest1 = new AtomicInteger();
         AtomicInteger count = new AtomicInteger();
         Timer timer1 = new Timer(200, e1 -> {
-            DefaultTableModel model = (DefaultTableModel) outputTable.getModel();
+            model = (DefaultTableModel) outputTable.getModel();
             if (tableModel.getRowCount() > 2) {
                 if((Integer)tableModel.getValueAt(count.get(), 1) == best[0].getDecimalGenes() && nbBest0.get() == 0){
                     //System.out.println(tableModel.getValueAt(count.get(), 1)+"kept");
@@ -300,11 +385,7 @@ public class GUI extends JFrame {
 
     // Custom cell renderer
     static class MyCellRenderer extends DefaultTableCellRenderer {
-        private boolean colorText = true;
 
-        public void setColorText(boolean colorText) {
-            this.colorText = colorText;
-        }
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus,
                                                        int row, int column, int irow) {
@@ -312,11 +393,7 @@ public class GUI extends JFrame {
             Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             if (column == 2) {
                 String binaryString = value.toString();
-
-                if (!colorText) {
-                    // set all text to black
-                    setText("<html><font color='black'>" + value.toString() + "</font></html>");
-                }else if(irow == 0){
+                if(irow == 0){
                     String coloredPart = binaryString.substring(0, Crossover.crossoverPoint == -1 ? 0 : Crossover.crossoverPoint);
                     String rest = binaryString.substring(Crossover.crossoverPoint == -1 ? 8 : Crossover.crossoverPoint, 8);
                     setText("<html><font color='red'>" + coloredPart + "</font><font color='black'>" + rest + "</font></html>");
@@ -324,85 +401,36 @@ public class GUI extends JFrame {
                     String rest = binaryString.substring(0, Crossover.crossoverPoint == -1 ? 0 : Crossover.crossoverPoint);
                     String coloredPart = binaryString.substring(Crossover.crossoverPoint == -1 ? 8 : Crossover.crossoverPoint);
                     setText("<html><font color='black'>" + rest + "</font><font color='blue'>" + coloredPart + "</font></html>");
-
                 }else if (irow == 2){
                     String coloredPart = binaryString.substring(0, Crossover.crossoverPoint == -1 ? 0 : Crossover.crossoverPoint);
                     String middle = binaryString.substring(Crossover.crossoverPoint == -1 ? 0 : Crossover.crossoverPoint, Crossover.crossoverPoint == -1 ? 8 : Crossover.crossoverPoint);
                     String rest = binaryString.substring(Crossover.crossoverPoint == -1 ? 8 : Crossover.crossoverPoint);
                     setText("<html><font color='red'>" + coloredPart + "</font><font color='black'>" + middle + "</font><font color='blue'>" + rest + "</html>");
-                }else{
-                    String all = binaryString.substring(0,8);
-                    setText("<html><font color='black'>"+all+"</font></html>");
+                } else if (irow == 10 || irow == 12) {
+                    StringBuilder coloredString = new StringBuilder();
+                    int start = 0;
+
+                    for (int mutatedIndex : Mutation.bitMutated) {
+                        // Make sure the index is within range before accessing binaryString
+                        if (mutatedIndex >= 0 && mutatedIndex < binaryString.length()) {
+                            String pre = binaryString.substring(start, mutatedIndex);
+                            String mutatedBit = binaryString.substring(mutatedIndex, mutatedIndex + 1);
+                            coloredString.append("<font color='black'>").append(pre).append("</font>");
+                            coloredString.append("<font color='red'>").append(mutatedBit).append("</font>");
+                            start = mutatedIndex + 1;
+                        }
+                    }
+
+                    // Add this line to handle the case when start is greater than or equal to the string length.
+                    if (start < binaryString.length()) {
+                        String post = binaryString.substring(start);
+                        coloredString.append("<font color='black'>").append(post).append("</font>");
+                    }
+
+                    setText("<html>" + coloredString.toString() + "</html>");
                 }
             }
             return c;
         }
     }
-
-
-
-
-
-
-    /*private void animateTableSorting(final Individuals[] pop) {
-        // Sort the 'pop' array based on 'Decimal' value
-        targetState = pop.clone();
-        Arrays.sort(targetState, Comparator.comparing(Individuals::getDecimalGenes));
-
-        animationTimer = new Timer(100, new ActionListener() {
-        int frame = 0;
-        int totalFrames = 10; // Choose the number of frames that gives you the desired speed
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (frame >= totalFrames) {
-                    // Stop the animation
-                    ((Timer) e.getSource()).stop();
-                    updateTableForFrame(frame, totalFrames, pop, targetState);
-                    //updateAndSortTable(targetState); // Ensure the final state is correct
-                    return;
-                }
-                // Calculate the next frame and update the table
-                updateTableForFrame(frame, totalFrames, pop, targetState);
-                frame++;
-            }
-        });
-
-        animationTimer.start();
-    }
-
-    private void updateTableForFrame(int frame, int totalFrames, Individuals[] initialState, Individuals[] finalState) {
-        // Clear existing rows
-        tableModel.setRowCount(0);
-        // Calculate and set the data for this frame
-        for (int i = 0; i < initialState.length; i++) {
-            // Here, calculate the data for row 'i' based on its initial and final state
-            // and the current frame. For example:
-            int initialDecimal = initialState[i].getDecimalGenes();
-            int finalDecimal = finalState[i].getDecimalGenes();
-            int animatedDecimal = initialDecimal + (finalDecimal - initialDecimal) * frame / totalFrames;
-
-            // Add row to table model
-            Individuals ind = initialState[i];
-            Object[] row = new Object[]{
-                    (i + 1),
-                    animatedDecimal,
-                    ind.getBinaryGenes(),
-                    ind.getArrayGenes()[0],
-                    ind.getArrayGenes()[1],
-                    ind.getArrayGenes()[2],
-                    ind.getArrayGenes()[3],
-                    ind.getArrayGenes()[4],
-                    ind.getArrayGenes()[5],
-                    ind.getArrayGenes()[6],
-                    ind.getArrayGenes()[7]
-            };
-            tableModel.addRow(row);
-
-            // Notify the table that the data has changed
-            tableModel.fireTableDataChanged();
-
-        }
-
-    }*/
 }
