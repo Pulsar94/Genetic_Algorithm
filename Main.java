@@ -70,20 +70,25 @@ public class Main {
 
             } while (valid == 0);
 
-            System.out.println(Const.defaultValue + "Do you want to to mutate many genes at once? " + Const.red + Const.underline + "y/n" + Const.defaultValue + "(default no)");
-            String mutation = scanner.nextLine();
             int numberGenes = 1;
-            if (mutation.equalsIgnoreCase("Y")) {
-                do {
-                    System.out.println(Const.defaultValue + "Enter the number of genes to mutate or press " + Const.red + Const.underline + "Enter" + Const.defaultValue + " for default:");
-                    if (scanner.hasNextInt()) {
-                        numberGenes = scanner.nextInt();
-                        if (numberGenes > 8 || numberGenes < 0) {
-                            System.out.println(Const.defaultValue + "The number of genes to mutate must be between 1 and 8. Please try again.");
-                        }
+            System.out.println(Const.defaultValue + "Enter the number of genes to mutate or press " + Const.red + Const.underline + "Enter" + Const.defaultValue + " for default (1):");
+            do {
+                String numberGenesStr = scanner.nextLine();
+                if (numberGenesStr.isEmpty()) {
+                    numberGenes = 1;
+                    break;
+                }
+                try {
+                    numberGenes = Integer.parseInt(numberGenesStr);
+                    if (numberGenes < 0 || numberGenes > 8) {
+                        System.out.println(Const.defaultValue + "The number of genes to mutate must be between 0 and 8. Please try again.");
+                    } else {
+                        valid = 1;
                     }
-                } while (numberGenes < 0 || numberGenes > 8);
-            }
+                } catch (NumberFormatException e) {
+                    System.out.println(Const.defaultValue + "That's not an integer. Please enter an integer.");
+                }
+            } while (valid == 0);
 
             System.out.println(Const.defaultValue + "Using a population size of " + individualsNumber);
             System.out.println(Const.defaultValue + "Using the following fitness function: " + initialCustomFitnessFunction + "\n");
@@ -119,7 +124,7 @@ public class Main {
             } else {
                 System.out.println(Const.defaultValue + "The root of the function is: " + Individuals.findRoot(customFitnessFunction));
             }
-            while (pop[0].getFitness() != 0 && pop[1].getFitness() != 0 && counter[0] + counter[1] < 10000000) {
+            while (pop[0].getFitness() != 0 && pop[1].getFitness() != 0 && counter[0] + counter[1] < 1000000) {
                 pop = evolution(pop, individualsNumber, counter, customFitnessFunction, numberGenes);
                 individualsNumber = 3;
             }
@@ -139,10 +144,10 @@ public class Main {
         Individuals[] best = Selection.selection(pop, individualsNumber);
         Random rand = new Random();
         String newpop;
-        if (rand.nextInt(10) < (number_mut == 0 ? 0 : 10)) {
+        if (rand.nextInt(10) < (number_mut == 0 ? 0 : 3)) {
             // System.out.println("Mutation");
             newpop = Mutation.mutation(best[0].getBinaryGenes(), number_mut);
-//            System.out.println("Before: " + best[0].getBinaryGenes() + " After: " + newpop);
+            System.out.println("Before: " + best[0].getBinaryGenes() + " After: " + newpop);
             counter[0]++;
         } else {
             // System.out.println("Crossover");
