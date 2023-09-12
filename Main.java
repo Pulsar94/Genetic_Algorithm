@@ -10,7 +10,7 @@ public class Main {
         System.out.println(Const.defaultValue + "Press " + Const.red + Const.underline + "Enter\033[0m" + Const.defaultValue + " to continue");
         sc.nextLine();
         do {
-            System.out.println(Const.defaultValue + "Enter the number of individuals in the population or press " + Const.red + Const.underline + "Enter\033[0m" + Const.defaultValue + " for default:");
+            System.out.println(Const.defaultValue + "Enter the number of individuals in the population or press " + Const.red + Const.underline + "Enter\033[0m" + Const.defaultValue + " for default (15):");
 
             // Handling individualsNumber
             int valid = 0;
@@ -94,10 +94,7 @@ public class Main {
             Individuals[] pop = new Individuals[individualsNumber];
             for (int i = 0; i < individualsNumber; i++) {
                 pop[i] = new Individuals(customFitnessFunction);
-                //if (pop[i].getDecimalGenes() == 2){
-                    System.out.println(pop[i].getDecimalGenes());
-                    //System.out.println(pop[i].getFitness());
-                //}
+                System.out.println(pop[i].getDecimalGenes() + " - " + pop[i].getBinaryGenes());
             }
 
 
@@ -142,14 +139,12 @@ public class Main {
         String newpop;
         if (rand.nextInt(10) < 3) {
             // System.out.println("Mutation");
-            Mutation mut = new Mutation();
-            newpop = mut.mutation(best[0].getBinaryGenes(), numberGenes);
+            newpop = Mutation.mutation(best[0].getBinaryGenes(), numberGenes);
 //            System.out.println("Before: " + best[0].getBinaryGenes() + " After: " + newpop);
             counter[0]++;
         } else {
             // System.out.println("Crossover");
-            Crossover cross = new Crossover();
-            newpop = cross.crossover(best[0].getBinaryGenes(), best[1].getBinaryGenes());
+            newpop = Crossover.crossover(best[0].getBinaryGenes(), best[1].getBinaryGenes());
             counter[1]++;
         }
 
