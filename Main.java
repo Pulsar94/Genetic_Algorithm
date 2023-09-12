@@ -147,7 +147,7 @@ public class Main {
         if (rand.nextInt(10) < (number_mut == 0 ? 0 : 3)) {
             // System.out.println("Mutation");
             newpop = Mutation.mutation(best[0].getBinaryGenes(), number_mut);
-            System.out.println("Before: " + best[0].getBinaryGenes() + " After: " + newpop);
+//            System.out.println("Before: " + best[0].getBinaryGenes() + " After: " + newpop);
             counter[0]++;
         } else {
             // System.out.println("Crossover");
