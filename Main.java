@@ -12,12 +12,10 @@ public class Main {
     public static void main(String[] args) throws ScriptException {
 
         // region Initialization
-        boolean twins = true;
-        Display.clear();
+        boolean twins;
         Scanner sc = new Scanner(System.in);
-        System.out.println(Const.defaultValue + Const.bold + "Welcome to the Genetic Algorithm program");
-        System.out.println(Const.defaultValue + "Press " + Const.red + Const.underline + "Enter\033[0m"
-                + Const.defaultValue + " to continue");
+        Display.clear();
+        Display.waiting();
         sc.nextLine();
         // endregion
 
@@ -39,9 +37,9 @@ public class Main {
 
                 try {
                     individualsNumber = Integer.parseInt(individualsNumberStr);
-                    if (individualsNumber <= 0) {
+                    if (individualsNumber <= 2) {
                         System.out.println(Const.defaultValue
-                                + "The population size must be a positive integer. Please try again.");
+                                + "The population size must be at least 3. Please try again.");
                     } else {
                         valid = 1;
                     }
@@ -111,45 +109,50 @@ public class Main {
             // endregion
 
             // region Twins Input
-            System.out.println(Const.defaultValue + "Do you want twins? (y/n)");
-            do {
-                String twinsStr = scanner.nextLine();
+            if (individualsNumber < 256) {
+                System.out.println(Const.defaultValue + "Do you want twins? (y/n) Press " + Const.red + Const.underline
+                        + "Enter" + Const.defaultValue + " for default (y):");
+                do {
+                    String twinsStr = scanner.nextLine();
 
-                if (twinsStr.equalsIgnoreCase("n")) {
-                    twins = false;
-                    break;
-                } else if (twinsStr.equalsIgnoreCase("y")) {
-                    twins = true;
-                    break;
-                }
-                System.out.println(Const.defaultValue + "Please enter y or n");
-            } while (true);
+                    if (twinsStr.equalsIgnoreCase("n")) {
+                        twins = false;
+                        break;
+                    } else if (twinsStr.equalsIgnoreCase("y")) {
+                        twins = true;
+                        break;
+                    } else if (twinsStr.isEmpty()) {
+                        twins = true;
+                        break;
+                    }
+                    System.out.println(Const.defaultValue + "Please enter y or n");
+                } while (true);
+            } else twins = true;
             // endregion
 
             // region Initial Display
-            System.out.println(Const.defaultValue + "Using a population size of " + individualsNumber);
+            Display.clear();
+
             System.out.println(Const.defaultValue + "Using the following fitness function: "
                     + initialCustomFitnessFunction + "\n");
-
             // Reformat the custom fitness function for evaluation
             customFitnessFunction = reformat(initialCustomFitnessFunction);
 
             // Create an array of Individuals with binary genes
+            System.out.println(Const.defaultValue + "Using a population size of " + individualsNumber + ":");
             Individuals[] pop = new Individuals[individualsNumber];
             for (int i = 0; i < individualsNumber; i++) {
                 pop[i] = new Individuals(customFitnessFunction);
                 for (int j = 0; j < i; j++) {
-                    if (pop[i].getDecimalGenes() == pop[j].getDecimalGenes()) {
-                        if (!twins) {
-                            System.out.println("doing first population");
+                    if (!twins) {
+                        if (pop[i].getDecimalGenes() == pop[j].getDecimalGenes()) {
+//                            System.out.println("doing first population");
                             i--;
                             break;
-                        } else {
-                            pop[i] = new Individuals(customFitnessFunction);
-                            j = -1;
                         }
                     }
                 }
+                System.out.println(Const.defaultValue + "Individual " + (i + 1) + ": " + pop[i].getDecimalGenes() + " - " + pop[i].getBinaryGenes() + " -> " + pop[i].getFitness());
             }
             // endregion
 
@@ -187,7 +190,7 @@ public class Main {
             // endregion
 
             // Print results
-            System.out.println(Const.defaultValue + "The best individual is: " + pop[0].getDecimalGenes()
+            System.out.println(Const.defaultValue + "\n\nThe best individual is: " + pop[0].getDecimalGenes()
                     + " and his fitness score is: "
                     + pop[0].getFitness());
             System.out.println(Const.defaultValue + "The number of mutation is: " + counter[0]);

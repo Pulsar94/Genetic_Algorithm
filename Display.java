@@ -2,7 +2,7 @@ import java.io.IOException;
 
 public class Display {
     public static void waiting() {
-        System.out.println("\nPress enter to continue...");
+        System.out.println(Const.defaultValue + "\nPress " + Const.underline + Const.red + "Enter" + Const.defaultValue + " to continue...");
         try {
             System.in.read();
         } catch (IOException e) {
@@ -17,5 +17,6 @@ public class Display {
         } catch (IOException | InterruptedException e) {
             System.out.println(e);
         }
+        System.out.println(Const.defaultValue + Const.bold + "Welcome to the Genetic Algorithm program");
     }
 }
