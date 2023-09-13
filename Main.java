@@ -21,6 +21,7 @@ public class Main {
 
         do {
             // region Individuals Number Input
+            Display.clear();
             System.out.println(Const.defaultValue + "Enter the number of individuals in the population or press "
                     + Const.red + Const.underline + "Enter\033[0m" + Const.defaultValue + " for default (15):");
 
@@ -50,6 +51,7 @@ public class Main {
             // endregion
 
             // region Custom Fitness Function Input
+            Display.clear();
             String initialCustomFitnessFunction;
             String customFitnessFunction;
 
@@ -85,6 +87,7 @@ public class Main {
             // endregion
 
             // region Number of Genes to Mutate Input
+            Display.clear();
             int numberGenes = 1;
             System.out.println(Const.defaultValue + "Enter the number of genes to mutate or press " + Const.red
                     + Const.underline + "Enter" + Const.defaultValue + " for default (1):");
@@ -109,6 +112,7 @@ public class Main {
             // endregion
 
             // region Twins Input
+            Display.clear();
             if (individualsNumber < 256) {
                 System.out.println(Const.defaultValue + "Do you want twins? (y/n) Press " + Const.red + Const.underline
                         + "Enter" + Const.defaultValue + " for default (y):");
@@ -133,13 +137,12 @@ public class Main {
             // region Initial Display
             Display.clear();
 
-            System.out.println(Const.defaultValue + "Using the following fitness function: "
-                    + initialCustomFitnessFunction + "\n");
+            System.out.println(Const.defaultValue + "Using the following fitness function: " + Const.bold + Const.red + initialCustomFitnessFunction + "\n");
             // Reformat the custom fitness function for evaluation
             customFitnessFunction = reformat(initialCustomFitnessFunction);
 
             // Create an array of Individuals with binary genes
-            System.out.println(Const.defaultValue + "Using a population size of " + individualsNumber + ":");
+            System.out.println(Const.defaultValue + "Using a population size of " + Const.underline + Const.red + individualsNumber + Const.defaultValue + ":\n");
             Individuals[] pop = new Individuals[individualsNumber];
             for (int i = 0; i < individualsNumber; i++) {
                 pop[i] = new Individuals(customFitnessFunction);
@@ -152,7 +155,7 @@ public class Main {
                         }
                     }
                 }
-                System.out.println(Const.defaultValue + "Individual " + (i + 1) + ": " + pop[i].getDecimalGenes() + " - " + pop[i].getBinaryGenes() + " -> " + pop[i].getFitness());
+                System.out.println(Const.underline + Const.cyan + "Individual " + (i + 1) + Const.defaultValue + ": " + pop[i].getDecimalGenes() + " - " + pop[i].getBinaryGenes() + " -> " + pop[i].getFitness());
             }
             // endregion
 
@@ -175,10 +178,10 @@ public class Main {
             // Check if a root exists for the fitness function
             if (Individuals.findRoot(customFitnessFunction) == null) {
                 System.out.println(Const.defaultValue
-                        + "There is no root found for the following function between 0 and 255\nf(x) -> "
+                        + "\nThere is no root found for the following function between 0 and 255\nf(x) -> "
                         + initialCustomFitnessFunction);
             } else {
-                System.out.println(Const.defaultValue + "The root of the function is: "
+                System.out.println(Const.defaultValue + "\nThe root of the function is: "
                         + Individuals.findRoot(customFitnessFunction));
             }
 
@@ -196,11 +199,13 @@ public class Main {
             System.out.println(Const.defaultValue + "The number of mutation is: " + counter[0]);
             System.out.println(Const.defaultValue + "The number of crossover is: " + counter[1]);
             System.out.println(Const.defaultValue + "\nPress " + Const.red + Const.underline + "Enter"
-                    + Const.defaultValue + " to continue or press " + Const.red + Const.underline + "0"
+                    + Const.defaultValue + " to continue or press " + Const.red + Const.underline + "any key"
                     + Const.defaultValue + " to exit");
 
         } while (sc.nextLine().isEmpty());
 
+        Display.clear();
+        System.out.println(Const.bold + "Thank you for using our program!" + Const.defaultValue);
         sc.close();
     }
 

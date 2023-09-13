@@ -2,13 +2,12 @@ import java.io.IOException;
 
 public class Display {
     public static void waiting() {
-        System.out.println(Const.defaultValue + "\nPress " + Const.underline + Const.red + "Enter" + Const.defaultValue + " to continue...");
+        System.out.println(Const.defaultValue + "Press " + Const.underline + Const.red + "Enter" + Const.defaultValue + " to continue...");
         try {
             System.in.read();
         } catch (IOException e) {
             System.out.println(e);
         }
-        clear();
     }
 
     public static void clear() {
@@ -17,13 +16,12 @@ public class Display {
         } catch (IOException | InterruptedException e) {
             System.out.println(e);
         }
-        System.out.println(Const.defaultValue + Const.bold + "Welcome to the Genetic Algorithm program");
         System.out.println("░██████╗░███████╗███╗░░██╗███████╗████████╗██╗░█████╗░     ░█████╗░██╗░░░░░░██████╗░░█████╗░██████╗░██╗████████╗██╗░░██╗███╗░░░███╗\n" +
                 "██╔════╝░██╔════╝████╗░██║██╔════╝╚══██╔══╝██║██╔══██╗     ██╔══██╗██║░░░░░██╔════╝░██╔══██╗██╔══██╗██║╚══██╔══╝██║░░██║████╗░████║\n" +
                 "██║░░██╗░█████╗░░██╔██╗██║█████╗░░░░░██║░░░██║██║░░╚═╝     ███████║██║░░░░░██║░░██╗░██║░░██║██████╔╝██║░░░██║░░░███████║██╔████╔██║\n" +
                 "██║░░╚██╗██╔══╝░░██║╚████║██╔══╝░░░░░██║░░░██║██║░░██╗     ██╔══██║██║░░░░░██║░░╚██╗██║░░██║██╔══██╗██║░░░██║░░░██╔══██║██║╚██╔╝██║\n" +
                 "╚██████╔╝███████╗██║░╚███║███████╗░░░██║░░░██║╚█████╔╝     ██║░░██║███████╗╚██████╔╝╚█████╔╝██║░░██║██║░░░██║░░░██║░░██║██║░╚═╝░██║\n" +
-                "░╚═════╝░╚══════╝╚═╝░░╚══╝╚══════╝░░░╚═╝░░░╚═╝░╚════╝░     ╚═╝░░╚═╝╚══════╝░╚═════╝░░╚════╝░╚═╝░░╚═╝╚═╝░░░╚═╝░░░╚═╝░░╚═╝╚═╝░░░░░╚═╝"
+                "░╚═════╝░╚══════╝╚═╝░░╚══╝╚══════╝░░░╚═╝░░░╚═╝░╚════╝░     ╚═╝░░╚═╝╚══════╝░╚═════╝░░╚════╝░╚═╝░░╚═╝╚═╝░░░╚═╝░░░╚═╝░░╚═╝╚═╝░░░░░╚═╝\n"
         );
     }
 }
