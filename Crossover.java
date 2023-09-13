@@ -1,9 +1,6 @@
 import java.util.Random;
 
 public class Crossover {
-    /**
-     * The point at which genetic crossover occurs.
-     */
     public static int crossoverPoint = -1;
 
     /**

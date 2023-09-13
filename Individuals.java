@@ -4,10 +4,12 @@ import javax.script.ScriptException;
 import java.util.Random;
 
 public class Individuals {
+    // region attributes
     private static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");
     private int decimalGenes;
     private int fitness;
     private static String fitnessFunction;
+    // endregion
 
     /**
      * Constructs a new individual with random decimal genes and evaluates its fitness.
