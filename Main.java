@@ -199,7 +199,7 @@ public class Main {
             System.out.println(Const.defaultValue + "The number of mutation is: " + counter[0]);
             System.out.println(Const.defaultValue + "The number of crossover is: " + counter[1]);
             System.out.println(Const.defaultValue + "\nPress " + Const.red + Const.underline + "Enter"
-                    + Const.defaultValue + " to continue or press " + Const.red + Const.underline + "any key"
+                    + Const.defaultValue + " to continue or enter " + Const.red + Const.underline + "anything"
                     + Const.defaultValue + " to exit");
 
         } while (sc.nextLine().isEmpty());

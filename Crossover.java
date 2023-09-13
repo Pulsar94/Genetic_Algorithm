@@ -15,10 +15,8 @@ public class Crossover {
         Random rand = new Random();
         crossoverPoint = rand.nextInt(binaryGenes1.length() + 1); // +1 to include the last index
 
-        // Combine the binary genes from both individuals at the crossover point.
-        crossoverGenes = binaryGenes1.substring(0, crossoverPoint) + binaryGenes2.substring(crossoverPoint);
+        crossoverGenes = String.join("", binaryGenes1.substring(0, crossoverPoint), binaryGenes2.substring(crossoverPoint));
 
-        // Return the new binary gene sequence.
         return crossoverGenes;
     }
 }

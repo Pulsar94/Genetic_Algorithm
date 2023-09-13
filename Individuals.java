@@ -2,6 +2,8 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 import java.util.Random;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Individuals {
     // region attributes
@@ -17,7 +19,7 @@ public class Individuals {
      * @param fitnessFunction The fitness function to evaluate.
      * @throws ScriptException If a script error occurs during fitness evaluation.
      */
-    public Individuals(String fitnessFunction) throws ScriptException {
+    Individuals(String fitnessFunction) throws ScriptException {
         Individuals.fitnessFunction = fitnessFunction;
         Random rand = new Random();
         decimalGenes = rand.nextInt(256);
@@ -31,7 +33,7 @@ public class Individuals {
      * @param fitnessFunction The fitness function to evaluate.
      * @throws ScriptException If a script error occurs during fitness evaluation.
      */
-    public Individuals(int decimalGenes, String fitnessFunction) throws ScriptException {
+    Individuals(int decimalGenes, String fitnessFunction) throws ScriptException {
         this.decimalGenes = decimalGenes;
         Individuals.fitnessFunction = fitnessFunction;
         evaluateFitness();
@@ -88,7 +90,6 @@ public class Individuals {
     public static Integer findRoot(String function) throws ScriptException {
         for (int x = 0; x <= 255; x++) {
             double f_x = evaluateExpression(function, x);
-
             if (Math.abs(f_x) < 1e-7) { // Assuming a small enough value is practically a root
                 return x;
             }
@@ -138,12 +139,11 @@ public class Individuals {
      * @return The binary genes as a string.
      */
     public String getBinaryGenes() {
-        StringBuilder binaryGenes = new StringBuilder(Integer.toBinaryString(decimalGenes));
-        for (int i = binaryGenes.length(); i < 8; i++) {
-            binaryGenes.insert(0, "0");
-        }
-        return binaryGenes.toString();
+        String binaryString = Integer.toBinaryString(decimalGenes);
+        String paddingZeros = Stream.generate(() -> "0").limit(8 - binaryString.length()).collect(Collectors.joining());
+        return paddingZeros + binaryString;
     }
+
 
     /**
      * Gets the individual's genes as an array of integers.
@@ -151,13 +151,11 @@ public class Individuals {
      * @return An array representing the individual's genes.
      */
     public int[] getArrayGenes() {
-        String binaryGenes = getBinaryGenes(); // Existing method that returns binary representation
-        int[] genes = new int[8]; // Assuming 8 genes
-        for (int i = 0; i < binaryGenes.length(); i++) {
-            genes[i] = Character.getNumericValue(binaryGenes.charAt(i));
-        }
-        return genes;
+        return getBinaryGenes().chars()
+                .map(Character::getNumericValue)
+                .toArray();
     }
+
 
     /**
      * Sets the binary genes of the individual.
