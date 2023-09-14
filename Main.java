@@ -1,4 +1,6 @@
 import javax.script.ScriptException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
 
@@ -25,8 +27,8 @@ public class Main {
             System.out.println(Const.defaultValue + "Enter the number of individuals in the population or press "
                     + Const.red + Const.underline + "Enter\033[0m" + Const.defaultValue + " for default (15):");
 
-            int valid = 0;
-            int individualsNumber = -1; // Initialize to an invalid value
+            boolean invalidInput = true;
+            int individualsNumber = -1; // Initialize to an invalidInput value
 
             // Loop to choose population size
             do {
@@ -42,12 +44,12 @@ public class Main {
                         System.out.println(Const.defaultValue
                                 + "The population size must be at least 3. Please try again.");
                     } else {
-                        valid = 1;
+                        invalidInput = false;
                     }
                 } catch (NumberFormatException e) {
                     System.out.println(Const.defaultValue + "That's not an integer. Please enter an integer.");
                 }
-            } while (valid == 0);
+            } while (invalidInput);
             // endregion
 
             // region Custom Fitness Function Input
@@ -56,7 +58,6 @@ public class Main {
             String customFitnessFunction;
 
             Scanner scanner = new Scanner(System.in);
-            valid = 0;
             System.out.println(Const.defaultValue
                     + "Enter your custom fitness function using 'x' as the variable [e.g., (x + 3)^2 - 25] or press "
                     + Const.red + Const.underline + "Enter" + Const.defaultValue + " for default:");
@@ -68,27 +69,16 @@ public class Main {
                     initialCustomFitnessFunction = "(x + 3)^2 - 25";
                     break;
                 }
-                if (!initialCustomFitnessFunction.contains("x")) {
-                    System.out
-                            .println(Const.defaultValue + "Your custom fitness function must contain the variable 'x'");
-                    continue; // Loop will restart, skipping the following lines
-                }
+                invalidInput = !(initialCustomFitnessFunction.contains("x")
+                        && initialCustomFitnessFunction.chars().allMatch(c -> Character.isDigit(c) || "x+*-/^()sincoexpMath. ".indexOf(c) != -1));
 
-                for (char c : initialCustomFitnessFunction.toCharArray()) {
-                    if (!Character.isDigit(c) && "x+*-/^()sincoexpMath. ".indexOf(c) == -1) {
-                        System.out.println(Const.defaultValue + "Invalid character detected: " + c);
-                        valid = 0;
-                        break; // Exit the 'for' loop
-                    }
-                    valid = 1;
-                }
 
-            } while (valid == 0);
+            } while (invalidInput);
             // endregion
 
             // region Number of Genes to Mutate Input
             Display.clear();
-            int numberGenes = 1;
+            int numberGenes = -1;
             System.out.println(Const.defaultValue + "Enter the number of genes to mutate or press " + Const.red
                     + Const.underline + "Enter" + Const.defaultValue + " for default (1):");
             do {
@@ -97,18 +87,18 @@ public class Main {
                     numberGenes = 1;
                     break;
                 }
+
                 try {
                     numberGenes = Integer.parseInt(numberGenesStr);
                     if (numberGenes < 0 || numberGenes > 8) {
-                        System.out.println(Const.defaultValue
-                                + "The number of genes to mutate must be between 0 and 8. Please try again.");
+                        System.out.println(Const.defaultValue + "The number of genes to mutate must be between 0 and 8. Please try again.");
                     } else {
-                        valid = 1;
+                        invalidInput = false;
                     }
                 } catch (NumberFormatException e) {
                     System.out.println(Const.defaultValue + "That's not an integer. Please enter an integer.");
                 }
-            } while (valid == 0);
+            } while (invalidInput);
             // endregion
 
             // region Twins Input
@@ -149,7 +139,6 @@ public class Main {
                 for (int j = 0; j < i; j++) {
                     if (!twins) {
                         if (pop[i].getDecimalGenes() == pop[j].getDecimalGenes()) {
-//                            System.out.println("doing first population");
                             i--;
                             break;
                         }
@@ -192,7 +181,7 @@ public class Main {
             }
             // endregion
 
-            // Print results
+            // region Results
             System.out.println(Const.defaultValue + "\n\nThe best individual is: " + pop[0].getDecimalGenes()
                     + " and his fitness score is: "
                     + pop[0].getFitness());
@@ -201,6 +190,7 @@ public class Main {
             System.out.println(Const.defaultValue + "\nPress " + Const.red + Const.underline + "Enter"
                     + Const.defaultValue + " to continue or enter " + Const.red + Const.underline + "anything"
                     + Const.defaultValue + " to exit");
+            // endregion
 
         } while (sc.nextLine().isEmpty());
 
@@ -225,15 +215,13 @@ public class Main {
         Individuals[] best = Selection.selection(pop, individualsNumber);
         Random rand = new Random();
         String newpop;
+        int randomResult;
 
         do {
-            if (rand.nextInt(10) < (number_mut == 0 ? 0 : 3)) {
-                newpop = Mutation.mutation(best[0].getBinaryGenes(), number_mut);
-                counter[0]++;
-            } else {
-                newpop = Crossover.crossover(best[0].getBinaryGenes(), best[1].getBinaryGenes());
-                counter[1]++;
-            }
+            // Perform mutation or crossover using lambda :
+            randomResult = rand.nextInt(10);
+            newpop = (randomResult < (number_mut == 0 ? 0 : 3)) ? Mutation.mutation(best[0].getBinaryGenes(), number_mut) : Crossover.crossover(best[0].getBinaryGenes(), best[1].getBinaryGenes());
+            counter[(randomResult < (number_mut == 0 ? 0 : 3)) ? 0 : 1]++;
 
             pop[0] = best[0];
             pop[1] = best[1];
@@ -252,26 +240,17 @@ public class Main {
      * @return The reformatted fitness function.
      */
     public static String reformat(String function) {
-        // Replace ^ with Math.pow
-        String regexPow = "\\s*([\\w\\s+\\-*/()]+)\\s*\\^\\s*(\\d+)\\s*";
-        function = function.replaceAll(regexPow, "Math.pow($1, $2)");
+        String newFunction = function; // Declare a final variable
 
-        // Replace sin()
-        String regexSin = "\\s*sin\\(\\s*([^\\r)]+)\\s*\\)\\s*";
-        function = function.replaceAll(regexSin, "Math.sin($1)");
+        Map<String, String> replacements = new HashMap<>();
+        replacements.put("\\s*([\\w\\s+\\-*/()]+)\\s*\\^\\s*(\\d+)\\s*", "Math.pow($1, $2)");
+        replacements.put("\\s*sin\\(\\s*([^\\r)]+)\\s*\\)\\s*", "Math.sin($1)");
+        replacements.put("\\s*cos\\(\\s*([^\\)]+)\\s*\\)\\s*", "Math.cos($1)");
 
-        // Replace cos()
-        String regexCos = "\\s*cos\\(\\s*([^\\)]+)\\s*\\)\\s*";
-        function = function.replaceAll(regexCos, "Math.cos($1)");
+        for (Map.Entry<String, String> entry : replacements.entrySet()) {
+            newFunction = newFunction.replaceAll(entry.getKey(), entry.getValue());
+        }
 
-        // Replace exp()
-        String regexExp = "\\s*exp\\(\\s*([^\\)]+)\\s*\\)\\s*";
-        function = function.replaceAll(regexExp, "Math.exp($1)");
-
-        // Replace pi
-        String regexPi = "\\bpi\\b";
-        function = function.replaceAll(regexPi, String.valueOf(Math.PI));
-
-        return function;
+        return newFunction;
     }
 }
