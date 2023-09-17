@@ -144,7 +144,11 @@ public class Main {
                         }
                     }
                 }
-                System.out.println(Const.underline + Const.cyan + "Individual " + (i + 1) + Const.defaultValue + ": " + pop[i].getDecimalGenes() + " - " + pop[i].getBinaryGenes() + " -> " + pop[i].getFitness());
+                System.out.printf(Const.underline + Const.cyan + "Individual %2d" + Const.defaultValue + ": %3d - %s -> %d\n",
+                        (i + 1),
+                        pop[i].getDecimalGenes(),
+                        pop[i].getBinaryGenes(),
+                        pop[i].getFitness());
             }
             // endregion
 

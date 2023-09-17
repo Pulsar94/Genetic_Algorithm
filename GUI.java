@@ -77,7 +77,7 @@ public class GUI extends JFrame {
         add(new JLabel("Avoid twins:"));
         avoidTwinsCheckBox = new JCheckBox();
         add(avoidTwinsCheckBox);
-        avoidTwinsCheckBox.setSelected(true);
+        avoidTwinsCheckBox.setSelected(false);
 
 
         // Add a button to generate the initial population
@@ -466,19 +466,18 @@ public class GUI extends JFrame {
             Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             if (column == 2) {
                 String binaryString = value.toString();
-                if(irow == 0){
+                if (irow == 0) {
                     String coloredPart = binaryString.substring(0, Crossover.crossoverPoint == -1 ? 0 : Crossover.crossoverPoint);
                     String rest = binaryString.substring(Crossover.crossoverPoint == -1 ? 8 : Crossover.crossoverPoint, 8);
                     setText("<html><font color='red'>" + coloredPart + "</font><font color='black'>" + rest + "</font></html>");
-                } else if (irow == 1){
+                } else if (irow == 1) {
                     String rest = binaryString.substring(0, Crossover.crossoverPoint == -1 ? 0 : Crossover.crossoverPoint);
                     String coloredPart = binaryString.substring(Crossover.crossoverPoint == -1 ? 8 : Crossover.crossoverPoint);
                     setText("<html><font color='black'>" + rest + "</font><font color='blue'>" + coloredPart + "</font></html>");
-                }else if (irow == 2){
-                    String coloredPart = binaryString.substring(0, Crossover.crossoverPoint == -1 ? 0 : Crossover.crossoverPoint);
-                    String middle = binaryString.substring(Crossover.crossoverPoint == -1 ? 0 : Crossover.crossoverPoint, Crossover.crossoverPoint == -1 ? 8 : Crossover.crossoverPoint);
-                    String rest = binaryString.substring(Crossover.crossoverPoint == -1 ? 8 : Crossover.crossoverPoint);
-                    setText("<html><font color='red'>" + coloredPart + "</font><font color='black'>" + middle + "</font><font color='blue'>" + rest + "</html>");
+                } else if (irow == 2) {
+                    String redPart = binaryString.substring(0, Crossover.crossoverPoint == -1 ? 0 : Crossover.crossoverPoint);
+                    String bluePart = binaryString.substring(Crossover.crossoverPoint == -1 ? 8 : Crossover.crossoverPoint,8);
+                    setText("<html><font color='red'>" + redPart + "</font><font color='blue'>" + bluePart + "</font></html>");
                 } else if (irow == 10 || irow == 12) {
                     StringBuilder coloredString = new StringBuilder();
                     int start = 0;
@@ -491,7 +490,7 @@ public class GUI extends JFrame {
                             String pre = binaryString.substring(start, mutatedIndex);
                             String mutatedBit = binaryString.substring(mutatedIndex, mutatedIndex + 1);
                             coloredString.append("<font color='black'>").append(pre).append("</font>");
-                            coloredString.append("<font color='red'>").append(mutatedBit).append("</font>");
+                            coloredString.append("<font color='green'>").append(mutatedBit).append("</font>");
                             start = mutatedIndex + 1;
                         }
                     }
@@ -504,7 +503,28 @@ public class GUI extends JFrame {
 
                     setText("<html>" + coloredString + "</html>");
                 }
+
+            } else if (column >= 3 && column <= 10) {  // Columns 3 to 10 inclusive
+                if (column - 3 < (Crossover.crossoverPoint == -1 ? 0 : Crossover.crossoverPoint) && (irow == 0 || irow == 2)) {
+                    setForeground(Color.RED);
+                } else if (column - 3 >= (Crossover.crossoverPoint == -1 ? 8 : Crossover.crossoverPoint) && (irow == 1 || irow == 2)) {
+                    setForeground(Color.BLUE);
+                } else if (irow == 10 || irow == 12) {
+                    boolean isMutated = false;
+                    for (int mutatedIndex : Mutation.bitMutated) {
+                        if (column - 3 == mutatedIndex) {
+                            isMutated = true;
+                            break;
+                        }
+                    }
+                    if (isMutated) {
+                        setForeground(Color.GREEN); // Setting color to green for mutated genes
+                    } else {
+                        setForeground(Color.BLACK); // Setting color to black for non-mutated genes
+                    }
+                }
             }
+
             return c;
         }
     }
