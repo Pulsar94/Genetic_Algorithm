@@ -20,6 +20,8 @@ The individual who cancels the function (result equal to 0) is the best individu
 * With the project name, a `clear` is executed on the terminal to always keep the project
     name at the top of the terminal and keep it clean with no command history
 * GUI : Graphic User Interface
+  * We have two versions of our graphical interface, one is finished and functional (`GUI`),
+  the other is under development due to the use of animations (`GUI2`).
   * Double-entry table
   * Applying color to mutated or crossover genes
   * Animated sorting of the population by fitness function
@@ -41,5 +43,6 @@ The individual who cancels the function (result equal to 0) is the best individu
 
 # Use
 
-Run the `main` function in `Main.java` to start the program in the terminal.\
-Run the `main` function in `GUI.java` to start the program with the Graphic User Interface.
+To run the project, you need to set up your SDK to 1.8.\
+Run the `Main` function in `Main.java` to start the program in the terminal.\
+Run the `Main` function in `GUI.java` to start the program with the Graphic User Interface.
