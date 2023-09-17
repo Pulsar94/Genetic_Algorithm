@@ -246,6 +246,8 @@ public class Main {
         replacements.put("\\s*([\\w\\s+\\-*/()]+)\\s*\\^\\s*(\\d+)\\s*", "Math.pow($1, $2)");
         replacements.put("\\s*sin\\(\\s*([^\\r)]+)\\s*\\)\\s*", "Math.sin($1)");
         replacements.put("\\s*cos\\(\\s*([^\\)]+)\\s*\\)\\s*", "Math.cos($1)");
+        replacements.put("\\s*exp\\(\\s*([^\\r)]+)\\s*\\)\\s*", "Math.exp($1)");
+        replacements.put("\\bpi\\b", "Math.PI");
 
         for (Map.Entry<String, String> entry : replacements.entrySet()) {
             newFunction = newFunction.replaceAll(entry.getKey(), entry.getValue());
