@@ -3,7 +3,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
-
+@SuppressWarnings("ALL")
 public class Main {
     /**
      * Main method to execute the Genetic Algorithm program.
@@ -179,7 +179,7 @@ public class Main {
             }
 
             // Run the genetic algorithm until a termination condition is met
-            while (pop[0].getFitness() != 0 && pop[1].getFitness() != 0 && counter[0] + counter[1] < 10000) {
+            while (pop[0].getFitness() != 0 && pop[1].getFitness() != 0 && counter[0] + counter[1] < 100000) {
                 pop = evolution(pop, individualsNumber, counter, customFitnessFunction, numberGenes, twins);
                 individualsNumber = 3;
             }

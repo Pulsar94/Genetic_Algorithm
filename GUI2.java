@@ -12,6 +12,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@SuppressWarnings("ALL")
 public class GUI2 extends JFrame {
     //region attributes
     private static JFrame frame;
@@ -44,8 +45,6 @@ public class GUI2 extends JFrame {
     private static JLabel avoidTwinsLabel;
 
     private static JButton generateButton;
-    //private static JButton nextButton;
-    //private static JButton skipButton;
 
     private static JLabel movingGene1;
     private static JLabel movingGene2;
@@ -85,7 +84,6 @@ public class GUI2 extends JFrame {
 
     private static boolean childReady = false;
 
-    private final JScrollPane scrollPane;
     private final JScrollPane scrollPane1;
     private final JScrollPane scrollPane2;
     private final JScrollPane scrollPane3;
@@ -93,9 +91,7 @@ public class GUI2 extends JFrame {
     private JTable initialTable;
     private JTable parent1Table;
     private JTable parent2Table;
-    private JTable childTable;
     private boolean twins = true;
-    private final DefaultTableModel tableModel;
     private final DefaultTableModel tableModel1;
     private final DefaultTableModel tableModel2;
     private final DefaultTableModel tableModel3;
@@ -154,8 +150,6 @@ public class GUI2 extends JFrame {
             if (yButtons < 600)
                 yButtons++;
             generateButton.setBounds(312 - 14 + xInitial, 384 - 56 + 2*yButtons - 350, 62, 26);
-            ////nextButton.setBounds(312 - 14 + xInitial, 384 - 56 + yButtons, 60, 26);
-            ////skipButton.setBounds(377 - 14 + xInitial, 384 - 56 + yButtons, 59, 26);
 
             if (xParent1 == xParent1Final && yParent1 == yParent1Final && xParent2 == xParent2Final && yParent2 == yParent2Final && ySettings == 56 && yButtons == 600) {
                 ((Timer) arg0.getSource()).stop();
@@ -170,12 +164,9 @@ public class GUI2 extends JFrame {
         frame.getContentPane().setLayout(null);
         frame.setSize(1950, 1025);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        //frame.setBounds(700, 150, 700, 480);
-        //set frame to fullscreen
         frame.setBounds(-10, 0, 1950, 1025);
         frame.setTitle("Genetic Algorithm");
         try {
-            // Initialize an Image object with the path to your icon
             Image icon = Toolkit.getDefaultToolkit().getImage("DNA.jpg");
             // Set the window icon
             setIconImage(icon);
@@ -187,32 +178,23 @@ public class GUI2 extends JFrame {
         frame.setLayout(new FlowLayout());
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        //frame.setPreferredSize(new Dimension(700, 480));
         frame.setPreferredSize(new Dimension(1950, 1025));
         frame.setResizable(false);
 
         // Add components for nbpop
-        //frame.add(new JLabel("Enter the number of individuals:"));
         nbpopTextField = new JTextField(2);
-        //frame.add(nbpopTextField);
         nbpopTextField.setText("15");
 
         // Add components for initialCustomFunction
-        //frame.add(new JLabel("Enter the Fitness Function:"));
         initialCustomFitnessFunctionTextField = new JTextField(7);
-        //frame.add(initialCustomFitnessFunctionTextField);
         initialCustomFitnessFunctionTextField.setText("(x + 3)^2 - 25");
 
         // Add components for nbpop
-        //frame.add(new JLabel("Enter the number of mutation:"));
         nbMutationTextField = new JTextField(1);
-        //frame.add(nbMutationTextField);
         nbMutationTextField.setText("1");
 
         // Add components for twins
-        //frame.add(new JLabel("Avoid twins:"));
         avoidTwinsCheckBox = new JCheckBox();
-        //frame.add(avoidTwinsCheckBox);
         avoidTwinsCheckBox.setSelected(false);
 
 
@@ -290,80 +272,6 @@ public class GUI2 extends JFrame {
 
         initialTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
         initialTable.repaint();
-
-        //endregion
-
-        //region childTable
-        childTable = new JTable() {
-            public boolean editCellAt(int row, int column, java.util.EventObject e) {
-                return false;
-            }
-
-            @Override
-            public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
-                Component c = super.prepareRenderer(renderer, row, column);
-
-                if (applyCustomRenderer) {
-                    if (crossover) {
-                        if (row == 0) {
-                            return new MyCellRenderer().getTableCellRendererComponent(this, getModel().getValueAt(row, column),
-                                    isCellSelected(row, column), false, row, column, 2, childReady);
-                        }
-                    } else {
-                        if (row == 0) {
-                            return new MyCellRenderer().getTableCellRendererComponent(this, getModel().getValueAt(row, column),
-                                    isCellSelected(row, column), false, row, column, 12, childReady);
-                        }
-                    }
-                }
-
-                return c;
-            }
-        };
-
-        childTable.setFont(new Font("Monospaced", Font.BOLD, 14));
-        childTable.setSize(653, 323);
-        childTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
-        childTable.setDragEnabled(false);
-        childTable.setRowSelectionAllowed(false);
-        childTable.setCellSelectionEnabled(false);
-        childTable.setShowGrid(true);
-        childTable.setGridColor(Color.BLACK);
-        childTable.setRowHeight(20);
-
-
-
-        tableModel = new DefaultTableModel(columnNames, 0);
-        childTable.setModel(tableModel);
-        //getContentPane().add(outputTable);
-
-        // Wrap the JTextPane in a JScrollPane to make it scrollable
-        scrollPane = new JScrollPane(
-                childTable,
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,   // Enable vertical scrollbar when needed
-                JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED  // Enable horizontal scrollbar when needed
-        );
-        //frame.getContentPane().add(scrollPane);
-        //scrollPane.setPreferredSize(new Dimension(653, 323));
-        scrollPane.setBounds(xInitial, yInitial, 653, 323);
-
-        // Applying the custom cell renderer to your JTable
-
-
-        childTable.getColumnModel().getColumn(0).setPreferredWidth(75);
-        childTable.getColumnModel().getColumn(1).setPreferredWidth(55);
-        childTable.getColumnModel().getColumn(2).setPreferredWidth(80);
-        childTable.getColumnModel().getColumn(3).setPreferredWidth(55);
-        childTable.getColumnModel().getColumn(4).setPreferredWidth(55);
-        childTable.getColumnModel().getColumn(5).setPreferredWidth(55);
-        childTable.getColumnModel().getColumn(6).setPreferredWidth(55);
-        childTable.getColumnModel().getColumn(7).setPreferredWidth(55);
-        childTable.getColumnModel().getColumn(8).setPreferredWidth(55);
-        childTable.getColumnModel().getColumn(9).setPreferredWidth(55);
-        childTable.getColumnModel().getColumn(10).setPreferredWidth(55);
-
-        childTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
-        childTable.repaint();
 
         //endregion
 
@@ -514,39 +422,7 @@ public class GUI2 extends JFrame {
         //endregion
 
 
-
-
-        //add a next button
-        //nextButton = new JButton("Next");
-        //frame.add(//nextButton);
-
-        //nextButton.addActionListener(e -> evolvingPopulation());
-        //nextButton.addActionListener(e -> {
-        // Set your custom cell renderer here
-        //childTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
-        //});
-
-        //skipButton = new JButton("Skip");
-
-        //nextButton.setEnabled(false);
-        //skipButton.setEnabled(false);
-
-        //frame.add(//skipButton);
-
-        /*skipButton.addActionListener(e -> {
-            try {
-                evolvedPopulation();
-            } catch (ScriptException ex) {
-                throw new RuntimeException(ex);
-            }
-        });
-        skipButton.addActionListener(e -> {
-            // Set your custom cell renderer here
-            childTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
-        });*/
-
         generateButton.addActionListener(e -> {
-            // Validation for nbpopTextField
             String nbpopText = nbpopTextField.getText();
             yInitial = 350;
             xParent1 = xInitial;
@@ -565,15 +441,13 @@ public class GUI2 extends JFrame {
             movingGene8.setVisible(false);
             scrollPane3.setVisible(true);
             tableModel3.setRowCount(0);
-            scrollPane.setVisible(false);
-            tableModel.setRowCount(0);
             scrollPane1.setVisible(false);
             tableModel1.setRowCount(0);
             scrollPane2.setVisible(false);
             tableModel2.setRowCount(0);
             time = 2500;
 
-
+            // Validation for nbpopTextField
             try {
                 int value = Integer.parseInt(nbpopText);
                 if (value < 3) {
@@ -605,8 +479,6 @@ public class GUI2 extends JFrame {
                 return;
             }
             try {
-                //nextButton.setEnabled(true);
-                //skipButton.setEnabled(true);
                 time = 2500;
                 counter = new int[]{0, 0};
                 generateInitialPopulation();
@@ -616,7 +488,6 @@ public class GUI2 extends JFrame {
         });
 
         generateButton.addActionListener(e -> {
-            // Set your custom cell renderer here
             initialTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
         });
 
@@ -649,109 +520,54 @@ public class GUI2 extends JFrame {
         avoidTwinsCheckBox.setBounds(367 - 14 + xInitial, 30 - 56 + yInitial, 21, 21);
         frame.add(avoidTwinsCheckBox);
 
-        //layeredPane.setBounds(0, 0, 673, 383);
         layeredPane.setBounds(0, 0, 1950, 1025);
-        //set layeredPane fullscreen
         frame.add(layeredPane);
 
-        generateButton.setBounds(312 - 14 + xInitial, 384 - 56 + yInitial, 62, 26);//245 - 14 + xInitial, 384 - 56 + yInitial, 62, 26);
+        generateButton.setBounds(312 - 14 + xInitial, 384 - 56 + yInitial, 62, 26);
         frame.add(generateButton);
 
-        //nextButton.setBounds(312 - 14 + xInitial, 384 - 56 + yInitial, 60, 26);
-        //frame.add(nextButton);
-
-        //skipButton.setBounds(377 - 14 + xInitial, 384 - 56 + yInitial, 59, 26);
-        //frame.add(//skipButton);
 
         //region movingGenes
 
         movingGene1 = new JLabel("0");
         movingGene1.setFont(new Font("Monospaced", Font.BOLD, 14));
-        //movingGene1.setBounds(gene1LeftPosition[0], gene1LeftPosition[1], 20, 20);
-        //movingGene1.setBounds(gene1RightPosition[0], gene1RightPosition[1], 20, 20);
-        //movingGene1.setBounds(gene1MiddlePosition[0], gene1MiddlePosition[1], 20, 20);
-        //movingGene1.setBackground(Color.RED);
-        //movingGene1.setOpaque(true);
         frame.add(movingGene1);
         movingGene1.setVisible(false);
-        //movingGene1.setVisible(true);
 
         movingGene2 = new JLabel("0");
         movingGene2.setFont(new Font("Monospaced", Font.BOLD, 14));
-        //movingGene2.setBounds(gene2LeftPosition[0], gene2LeftPosition[1], 20, 20);
-        //movingGene2.setBounds(gene2RightPosition[0], gene2RightPosition[1], 20, 20);
-        //movingGene2.setBounds(gene2MiddlePosition[0], gene2MiddlePosition[1], 20, 20);
-        //movingGene2.setBackground(Color.RED);
-        //movingGene2.setOpaque(true);
         frame.add(movingGene2);
         movingGene2.setVisible(false);
-        //movingGene2.setVisible(true);
 
         movingGene3 = new JLabel("0");
         movingGene3.setFont(new Font("Monospaced", Font.BOLD, 14));
-        //movingGene3.setBounds(gene3LeftPosition[0], gene3LeftPosition[1], 20, 20);
-        //movingGene3.setBounds(gene3RightPosition[0], gene3RightPosition[1], 20, 20);
-        //movingGene3.setBounds(gene3MiddlePosition[0], gene3MiddlePosition[1], 20, 20);
-        //movingGene3.setBackground(Color.RED);
-        //movingGene3.setOpaque(true);
         frame.add(movingGene3);
         movingGene3.setVisible(false);
-        //movingGene3.setVisible(true);
 
         movingGene4 = new JLabel("0");
         movingGene4.setFont(new Font("Monospaced", Font.BOLD, 14));
-        //movingGene4.setBounds(gene4LeftPosition[0], gene4LeftPosition[1], 20, 20);
-        //movingGene4.setBounds(gene4RightPosition[0], gene4RightPosition[1], 20, 20);
-        //movingGene4.setBounds(gene4MiddlePosition[0], gene4MiddlePosition[1], 20, 20);
-        //movingGene4.setBackground(Color.RED);
-        //movingGene4.setOpaque(true);
         frame.add(movingGene4);
         movingGene4.setVisible(false);
-        //movingGene4.setVisible(true);
 
         movingGene5 = new JLabel("0");
         movingGene5.setFont(new Font("Monospaced", Font.BOLD, 14));
-        //movingGene5.setBounds(gene5LeftPosition[0], gene5LeftPosition[1], 20, 20);
-        //movingGene5.setBounds(gene5RightPosition[0], gene5RightPosition[1], 20, 20);
-        //movingGene5.setBounds(gene5MiddlePosition[0], gene5MiddlePosition[1], 20, 20);
-        //movingGene5.setBackground(Color.RED);
-        //movingGene5.setOpaque(true);
         frame.add(movingGene5);
         movingGene5.setVisible(false);
-        //movingGene5.setVisible(true);
 
         movingGene6 = new JLabel("0");
         movingGene6.setFont(new Font("Monospaced", Font.BOLD, 14));
-        //movingGene6.setBounds(gene6LeftPosition[0], gene6LeftPosition[1], 20, 20);
-        //movingGene6.setBounds(gene6RightPosition[0], gene6RightPosition[1], 20, 20);
-        //movingGene6.setBounds(gene6MiddlePosition[0], gene6MiddlePosition[1], 20, 20);
-        //movingGene6.setBackground(Color.RED);
-        //movingGene6.setOpaque(true);
         frame.add(movingGene6);
         movingGene6.setVisible(false);
-        //movingGene6.setVisible(true);
 
         movingGene7 = new JLabel("0");
         movingGene7.setFont(new Font("Monospaced", Font.BOLD, 14));
-        //movingGene7.setBounds(gene7LeftPosition[0], gene7LeftPosition[1], 20, 20);
-        //movingGene7.setBounds(gene7RightPosition[0], gene7RightPosition[1], 20, 20);
-        //movingGene7.setBounds(gene7MiddlePosition[0], gene7MiddlePosition[1], 20, 20);
-        //movingGene7.setBackground(Color.RED);
-        //movingGene7.setOpaque(true);
         frame.add(movingGene7);
         movingGene7.setVisible(false);
-        //movingGene7.setVisible(true);
 
         movingGene8 = new JLabel("0");
         movingGene8.setFont(new Font("Monospaced", Font.BOLD, 14));
-        //movingGene8.setBounds(gene8LeftPosition[0], gene8LeftPosition[1], 20, 20);
-        //movingGene8.setBounds(gene8RightPosition[0], gene8RightPosition[1], 20, 20);
-        //movingGene8.setBounds(gene8MiddlePosition[0], gene8MiddlePosition[1], 20, 20);
-        //movingGene8.setBackground(Color.RED);
-        //movingGene8.setOpaque(true);
         frame.add(movingGene8);
         movingGene8.setVisible(false);
-        //movingGene8.setVisible(true);
 
         //endregion
 
@@ -759,16 +575,15 @@ public class GUI2 extends JFrame {
         // Add tables to layered pane, specifying Z-index
         layeredPane.add(scrollPane2, Integer.valueOf(1));
         layeredPane.add(scrollPane1, Integer.valueOf(2));
-        layeredPane.add(scrollPane, Integer.valueOf(3));
-        layeredPane.add(scrollPane3, Integer.valueOf(4));
-        layeredPane.add(movingGene1, Integer.valueOf(5));
-        layeredPane.add(movingGene2, Integer.valueOf(6));
-        layeredPane.add(movingGene3, Integer.valueOf(7));
-        layeredPane.add(movingGene4, Integer.valueOf(8));
-        layeredPane.add(movingGene5, Integer.valueOf(9));
-        layeredPane.add(movingGene6, Integer.valueOf(10));
-        layeredPane.add(movingGene7, Integer.valueOf(11));
-        layeredPane.add(movingGene8, Integer.valueOf(12));
+        layeredPane.add(scrollPane3, Integer.valueOf(3));
+        layeredPane.add(movingGene1, Integer.valueOf(4));
+        layeredPane.add(movingGene2, Integer.valueOf(5));
+        layeredPane.add(movingGene3, Integer.valueOf(6));
+        layeredPane.add(movingGene4, Integer.valueOf(7));
+        layeredPane.add(movingGene5, Integer.valueOf(8));
+        layeredPane.add(movingGene6, Integer.valueOf(9));
+        layeredPane.add(movingGene7, Integer.valueOf(10));
+        layeredPane.add(movingGene8, Integer.valueOf(11));
 
         layeredPane.setVisible(true);
 
@@ -777,7 +592,6 @@ public class GUI2 extends JFrame {
     }
 
     private void generateInitialPopulation() throws ScriptException {
-        scrollPane.setVisible(false);
         scrollPane1.setVisible(false);
         scrollPane2.setVisible(false);
         scrollPane3.setVisible(true);
@@ -842,7 +656,6 @@ public class GUI2 extends JFrame {
             frame.add(scrollPane3);
 
             Timer timer = new Timer(2500 + 500 + 200 * individualsNumber, e -> {
-                scrollPane.setVisible(false);
                 scrollPane1.setVisible(true);
                 scrollPane2.setVisible(true);
                 scrollPane3.setVisible(false);
@@ -894,23 +707,21 @@ public class GUI2 extends JFrame {
 
             timer = new Timer(2500 + 7000 + 200 * individualsNumber, e -> {
                 Individuals Result;
-                if (Crossover.crossoverPoint == -1) { //rand.nextInt(10) < (mutationNumber == 0 ? 0 : 3)) {
+                if (Crossover.crossoverPoint == -1) {
                     // Mutation case
-                    String parent = parent1Table.getValueAt(0, 2).toString(); // Assuming we're using the first parent for mutation
 
+                    String parent = parent1Table.getValueAt(0, 2).toString();
                     // Create a new Individual object with the mutated string
                     Individuals MResult = pop[0];
                     try {
-                        MResult = new Individuals(Mutation.mutation(parent, mutationNumber), 2, customFitnessFunction);  // Assuming the mutation is handled elsewhere
+                        MResult = new Individuals(Mutation.mutation(parent, mutationNumber), 2, customFitnessFunction);
                     } catch (ScriptException ex) {
                         throw new RuntimeException(ex);
                     }
-
-                    // Adapt the crossover logic for mutation animation
                     JLabel[] movingGenes = {movingGene1, movingGene2, movingGene3, movingGene4, movingGene5, movingGene6, movingGene7, movingGene8};
                     int[][] genePositions = {gene1LeftPosition, gene2LeftPosition, gene3LeftPosition, gene4LeftPosition, gene5LeftPosition, gene6LeftPosition, gene7LeftPosition, gene8LeftPosition};
 
-                    int[] arrayGenes = MResult.getArrayGenes();  // I assumed getArrayGenes returns an int array
+                    int[] arrayGenes = MResult.getArrayGenes();
 
                     Set<Integer> mutatedIndices = new HashSet<>();
                     for (int index : Mutation.bitMutated) {
@@ -924,7 +735,7 @@ public class GUI2 extends JFrame {
                                 genePositions[i][1],
                                 20, 20
                         );
-                        movingGenes[i].setForeground(mutatedIndices.contains(i) ? Color.GREEN : Color.BLACK); // Color the mutated gene differently
+                        movingGenes[i].setForeground(mutatedIndices.contains(i) ? Color.GREEN : Color.BLACK); // Color the mutated genes green
                         movingGenes[i].setVisible(true);
                     }
 
@@ -951,6 +762,7 @@ public class GUI2 extends JFrame {
                     Result = MResult;
                 } else {
                     //crossover case
+
                     String result = Crossover.crossover(parent1Table.getValueAt(0, 2).toString(), parent2Table.getValueAt(0, 2).toString());
                     Individuals CResult = null;
                     try {
@@ -959,14 +771,12 @@ public class GUI2 extends JFrame {
                         throw new RuntimeException(ex);
                     }
 
-
-                    // Assuming movingGenes, geneLeftPositions and geneRightPositions are arrays or lists
                     JLabel[] movingGenes = {movingGene1, movingGene2, movingGene3, movingGene4, movingGene5, movingGene6, movingGene7, movingGene8};
                     int[][] geneLeftPositions = {gene1LeftPosition, gene2LeftPosition, gene3LeftPosition, gene4LeftPosition, gene5LeftPosition, gene6LeftPosition, gene7LeftPosition, gene8LeftPosition};
                     int[][] geneRightPositions = {gene1RightPosition, gene2RightPosition, gene3RightPosition, gene4RightPosition, gene5RightPosition, gene6RightPosition, gene7RightPosition, gene8RightPosition};
 
                     int crossoverPoint = Crossover.crossoverPoint;
-                    int[] arrayGenes = CResult.getArrayGenes();  // I assumed getArrayGenes returns an int array
+                    int[] arrayGenes = CResult.getArrayGenes();
 
                     for (int i = 0; i < movingGenes.length; i++) {
                         movingGenes[i].setText(arrayGenes[i] + "");
@@ -1008,7 +818,6 @@ public class GUI2 extends JFrame {
                 Timer timer2 = new Timer(4400, e1 -> {
                     tableModel3.setRowCount(0); // Clear existing rows
                     initialTable.setVisible(true);
-                    childTable.setVisible(false);
                     String binaryString = finalCResult.getBinaryGenes();
                     Object[] rowData = new Object[11];
                     rowData[0] = (Crossover.crossoverPoint == -1 ? "M" + counter[0] : "C" + counter[1]++);
@@ -1018,6 +827,7 @@ public class GUI2 extends JFrame {
                         rowData[j] = finalCResult.getArrayGenes()[j - 3];
                     }
                     tableModel3.addRow(rowData);
+
                     movingGene1.setVisible(true);
                     movingGene2.setVisible(true);
                     movingGene3.setVisible(true);
@@ -1063,7 +873,6 @@ public class GUI2 extends JFrame {
                     crossover = false;
                     try {
                         pop[2] = new Individuals(Mutation.mutation(best[0].getBinaryGenes(), mutationNumber), 2, customFitnessFunction);
-                        //System.out.println("Mutations index : "+Mutation.bitMutated[0] + ";" + Mutation.bitMutated[1]);
                     } catch (ScriptException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -1098,34 +907,6 @@ public class GUI2 extends JFrame {
             ((Timer) e.getSource()).stop();
         }).start();
         time = 0;
-    }
-
-    private void evolvedPopulation() throws ScriptException {
-        twins = !avoidTwinsCheckBox.isSelected();
-        applyCustomRenderer = false;
-        tableModel3.setRowCount(0); // Clear existing rows
-        while (pop[0].getFitness() != 0 && pop[1].getFitness() != 0 && counter[0] + counter[1] < 10000) {
-            pop = Main.evolution(pop, individualsNumber, counter, customFitnessFunction, mutationNumber, twins);
-            individualsNumber = 3;
-        }
-        Object[] crossoverRowData = new Object[11];
-        crossoverRowData[0] = "Best 1";
-        crossoverRowData[1] = pop[0].getDecimalGenes();
-        crossoverRowData[2] = pop[0].getBinaryGenes();
-        int[] crossoverGenes = pop[0].getArrayGenes();
-        for (int j = 3; j <= 10; j++) {
-            crossoverRowData[j] = crossoverGenes[j - 3];
-        }
-        tableModel3.addRow(crossoverRowData);
-        crossoverRowData[0] = "Best 2";
-        crossoverRowData[1] = pop[1].getDecimalGenes();
-        crossoverRowData[2] = pop[1].getBinaryGenes();
-        crossoverGenes = pop[1].getArrayGenes();
-        for (int j = 3; j <= 10; j++) {
-            crossoverRowData[j] = crossoverGenes[j - 3];
-        }
-        tableModel3.addRow(crossoverRowData);
-
     }
 
     /**
@@ -1171,7 +952,6 @@ public class GUI2 extends JFrame {
         timer1.start();
     }
 
-    // Custom cell renderer
     static class MyCellRenderer extends DefaultTableCellRenderer {
 
         public Component getTableCellRendererComponent(JTable table, Object value,
@@ -1211,7 +991,6 @@ public class GUI2 extends JFrame {
                         }
                     }
 
-                    // Add this line to handle the case when start is greater than or equal to the string length.
                     if (start < binaryString.length()) {
                         String post = binaryString.substring(start);
                         coloredString.append("<font color='black'>").append(post).append("</font>");
@@ -1220,7 +999,7 @@ public class GUI2 extends JFrame {
                     setText("<html>" + coloredString + "</html>");
                 }
 
-            } else if (column >= 3 && column <= 10) {  // Columns 3 to 10 inclusive
+            } else if (column >= 3 && column <= 10) {
                 if (column - 3 < (Crossover.crossoverPoint == -1 ? 0 : Crossover.crossoverPoint) && irow == 0) {
                     setForeground(Color.RED);
                 } else if (column - 3 >= (Crossover.crossoverPoint == -1 ? 8 : Crossover.crossoverPoint) && irow == 1) {

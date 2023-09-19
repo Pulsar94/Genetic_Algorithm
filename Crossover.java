@@ -1,5 +1,5 @@
 import java.util.Random;
-
+@SuppressWarnings("ALL")
 public class Crossover {
     public static int crossoverPoint = -1;
 

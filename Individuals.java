@@ -4,7 +4,7 @@ import javax.script.ScriptException;
 import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
+@SuppressWarnings("ALL")
 public class Individuals {
     // region attributes
     private static final ScriptEngine engine = new ScriptEngineManager().getEngineByName("JavaScript");

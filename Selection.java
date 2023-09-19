@@ -1,6 +1,6 @@
 import java.util.Comparator;
 import java.util.stream.*;
-
+@SuppressWarnings("ALL")
 public class Selection {
     /**
      * Selects the two best individuals from the population based on their fitness values.

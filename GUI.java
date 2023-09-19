@@ -4,12 +4,11 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
-import java.awt.event.KeyAdapter;
-import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
+@SuppressWarnings("ALL")
 public class GUI extends JFrame {
     //region attributes
     private JFrame frame;
@@ -40,7 +39,6 @@ public class GUI extends JFrame {
         setBounds(700, 150, 700, 480);
         setTitle("Genetic Algorithm");
         try {
-            // Initialize an Image object with the path to your icon
             Image icon = Toolkit.getDefaultToolkit().getImage("DNA.jpg");
             // Set the window icon
             setIconImage(icon);
@@ -80,10 +78,6 @@ public class GUI extends JFrame {
         avoidTwinsCheckBox.setSelected(false);
 
 
-        // Add a button to generate the initial population
-        JButton generateButton = new JButton("Start");
-
-
         String[] columnNames = {"Individual",
                 "Decimal",
                 "Binary",
@@ -91,6 +85,7 @@ public class GUI extends JFrame {
                 "Gen 4", "Gen 5", "Gen 6",
                 "Gen 7", "Gen 8"};
 
+        //region table
         outputTable = new JTable() {
             public boolean editCellAt(int row, int column, java.util.EventObject e) {
                 return false;
@@ -101,7 +96,7 @@ public class GUI extends JFrame {
 
                 if (applyCustomRenderer) {
                     if(crossover) {
-                        if (row == 0) { // Replace with your own conditions
+                        if (row == 0) {
                             return new MyCellRenderer().getTableCellRendererComponent(this, getModel().getValueAt(row, column),
                                     isCellSelected(row, column), false, row, column, 0);
                         } else if (row == 1) {
@@ -112,7 +107,7 @@ public class GUI extends JFrame {
                                     isCellSelected(row, column), false, row, column, 2);
                         }
                     }else {
-                        if (row == 0) { // Replace with your own conditions
+                        if (row == 0) {
                             return new MyCellRenderer().getTableCellRendererComponent(this, getModel().getValueAt(row, column),
                                     isCellSelected(row, column), false, row, column, 10);
                         }else if (row == 1) {
@@ -129,7 +124,7 @@ public class GUI extends JFrame {
             }
         };
 
-        //region table
+
         outputTable.setFont(new Font("Monospaced", Font.BOLD, 14));
         outputTable.setSize(653, 323);
         outputTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
@@ -139,8 +134,6 @@ public class GUI extends JFrame {
         outputTable.setShowGrid(true);
         outputTable.setGridColor(Color.BLACK);
         outputTable.setRowHeight(20);
-        //endregion
-
 
 
         model = new DefaultTableModel(columnNames, 0); // 0 means no rows initially
@@ -159,7 +152,6 @@ public class GUI extends JFrame {
         getContentPane().add(scrollPane);
         scrollPane.setPreferredSize(new Dimension(653, 323));
 
-        // Applying the custom cell renderer to your JTable
 
 
         outputTable.getColumnModel().getColumn(0).setPreferredWidth(75);
@@ -177,8 +169,10 @@ public class GUI extends JFrame {
         outputTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
         outputTable.repaint();
 
+        //endregion
 
-
+        // Add a button to generate the initial population
+        JButton generateButton = new JButton("Start");
         add(generateButton);
 
 
@@ -188,7 +182,6 @@ public class GUI extends JFrame {
 
         nextButton.addActionListener(e -> evolvingPopulation());
         nextButton.addActionListener(e -> {
-            // Set your custom cell renderer here
             outputTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
         });
 
@@ -207,7 +200,6 @@ public class GUI extends JFrame {
             }
         });
         skipButton.addActionListener(e -> {
-            // Set your custom cell renderer here
             outputTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
         });
 
@@ -256,7 +248,6 @@ public class GUI extends JFrame {
         });
 
         generateButton.addActionListener(e -> {
-            // Set your custom cell renderer here
             outputTable.getColumnModel().getColumn(2).setCellRenderer(new MyCellRenderer());
         });
 
@@ -264,14 +255,12 @@ public class GUI extends JFrame {
         setVisible(true);
     }
 
-
     private void generateInitialPopulation() throws ScriptException {
         String nbpopString = nbpopTextField.getText();
         String nbMutationString = nbMutationTextField.getText();
         String initialCustomFitnessFunctionString = initialCustomFitnessFunctionTextField.getText();
         twins = !avoidTwinsCheckBox.isSelected();
 
-        System.out.println(twins);
         if (nbpopString.equals("") || nbMutationString.equals("") || initialCustomFitnessFunctionString.equals("")) {
             JOptionPane.showMessageDialog(frame, "Please fill all fields.", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
@@ -310,7 +299,6 @@ public class GUI extends JFrame {
                 Object[] rowData = new Object[11];
                 rowData[0] = (i + 1);
                 rowData[1] = pop[i].getDecimalGenes();
-                //System.out.println(pop[i].getDecimalGenes());
                 rowData[2] = binaryString;
 
                 int[] genes = pop[i].getArrayGenes();
@@ -350,7 +338,6 @@ public class GUI extends JFrame {
                     crossover = false;
                     try {
                         pop[2] = new Individuals(Mutation.mutation(best[0].getBinaryGenes(), mutationNumber), 2, customFitnessFunction);
-                        //System.out.println("Mutations index : "+Mutation.bitMutated[0] + ";" + Mutation.bitMutated[1]);
                     } catch (ScriptException ex) {
                         throw new RuntimeException(ex);
                     }
@@ -363,7 +350,6 @@ public class GUI extends JFrame {
                     } catch (ScriptException ex) {
                         throw new RuntimeException(ex);
                     }
-                    System.out.println(pop[2].getBinaryGenes());
                 }
             }while (!twins && (pop[2].getDecimalGenes() == best[0].getDecimalGenes() || pop[2].getDecimalGenes() == best[1].getDecimalGenes()));
 
@@ -417,7 +403,6 @@ public class GUI extends JFrame {
     /** To get the two best individuals*/
     private void getTwoBestIndividuals() {
         Individuals[] best = Selection.selection(pop, pop.length);
-        System.out.println(best[0].getDecimalGenes()+"    "+best[1].getDecimalGenes());
         AtomicInteger nbBest0 = new AtomicInteger();
         AtomicInteger nbBest1 = new AtomicInteger();
         AtomicInteger count = new AtomicInteger();
@@ -425,16 +410,13 @@ public class GUI extends JFrame {
             model = (DefaultTableModel) outputTable.getModel();
             if (tableModel.getRowCount() > 2) {
                 if((Integer)tableModel.getValueAt(count.get(), 1) == best[0].getDecimalGenes() && nbBest0.get() == 0){
-                    //System.out.println(tableModel.getValueAt(count.get(), 1)+"kept");
                     count.getAndIncrement();
                     nbBest0.getAndIncrement();
                 }else if((Integer)tableModel.getValueAt(count.get(), 1) == best[1].getDecimalGenes() && nbBest1.get() == 0) {
-                    //System.out.println(tableModel.getValueAt(count.get(), 1)+"kept");
                     count.getAndIncrement();
                     nbBest1.getAndIncrement();
                 }
                 else{
-                    //System.out.println(tableModel.getValueAt(count.get(), 1)+"deleted");
                     tableModel.removeRow(count.get());
                 }
             } else {
@@ -461,7 +443,7 @@ public class GUI extends JFrame {
 
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus,
-                                                       int row, int column, int irow) {
+                                                        int row, int column, int irow) {
 
             Component c = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
             if (column == 2) {
@@ -494,8 +476,6 @@ public class GUI extends JFrame {
                             start = mutatedIndex + 1;
                         }
                     }
-
-                    // Add this line to handle the case when start is greater than or equal to the string length.
                     if (start < binaryString.length()) {
                         String post = binaryString.substring(start);
                         coloredString.append("<font color='black'>").append(post).append("</font>");
@@ -504,7 +484,7 @@ public class GUI extends JFrame {
                     setText("<html>" + coloredString + "</html>");
                 }
 
-            } else if (column >= 3 && column <= 10) {  // Columns 3 to 10 inclusive
+            } else if (column >= 3 && column <= 10) {
                 if (column - 3 < (Crossover.crossoverPoint == -1 ? 0 : Crossover.crossoverPoint) && (irow == 0 || irow == 2)) {
                     setForeground(Color.RED);
                 } else if (column - 3 >= (Crossover.crossoverPoint == -1 ? 8 : Crossover.crossoverPoint) && (irow == 1 || irow == 2)) {

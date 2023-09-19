@@ -1,5 +1,5 @@
 import java.util.Random;
-
+@SuppressWarnings("ALL")
 public class Mutation {
     public static int[] bitMutated;
 
