@@ -3,7 +3,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 import java.util.Scanner;
-@SuppressWarnings("ALL")
 public class Main {
     /**
      * Main method to execute the Genetic Algorithm program.

@@ -106,12 +106,27 @@ public class GUI2 extends JFrame {
     private int[] counter = {0, 0};
     //endregion
 
-
+    /**
+     * Entry point for the application.
+     *
+     * This method uses SwingUtilities.invokeLater to ensure that
+     * the GUI is created on the Event Dispatch Thread (EDT), which
+     * is the recommended practice in Swing applications.
+     *
+     * @param args Command-line arguments (not used).
+     */
     public static void main(String[] args) {
         javax.swing.SwingUtilities.invokeLater(GUI2::new);
     }
 
-
+    /**
+     * Custom ActionListener class for updating the positions of various Swing components.
+     *
+     * This class implements the ActionListener interface to control the movement of
+     * two JScrollPanes, and various Swing components like JLabels, JTextFields, etc.
+     * The class is responsible for repositioning these components in the GUI whenever
+     * an action event occurs.
+     */
     public static class MyActionListener implements ActionListener {
         private final JScrollPane scrollPane1;
         private final JScrollPane scrollPane2;
@@ -158,8 +173,15 @@ public class GUI2 extends JFrame {
         }
     }
 
-
-    public GUI2() {
+    /**
+     * Initializes the Genetic Algorithm GUI2.
+     *
+     * The GUI2 includes fields for setting the number of individuals, fitness function, and number of mutations.
+     * It also features a JTable to display the state of the algorithm and buttons to control the simulation.
+     *
+     * @throws RuntimeException If a ScriptException occurs during fitness evaluation.
+     */
+    public GUI2() throws RuntimeException {
         frame = new JFrame();
         frame.getContentPane().setLayout(null);
         frame.setSize(1950, 1025);
@@ -591,6 +613,13 @@ public class GUI2 extends JFrame {
         frame.setVisible(true);
     }
 
+    /**
+     * Initializes and displays the initial population for the genetic algorithm.
+     * Handles user input for population size, mutation rate, and custom fitness function.
+     * Uses Swing Timers for asynchronous operations.
+     *
+     * @throws ScriptException if the custom fitness function script fails.
+     */
     private void generateInitialPopulation() throws ScriptException {
         scrollPane1.setVisible(false);
         scrollPane2.setVisible(false);
@@ -849,6 +878,13 @@ public class GUI2 extends JFrame {
         }
     }
 
+    /**
+     * Evolves the current population asynchronously using mutation and crossover.
+     * Updates the GUI table with the new individual after performing either a mutation or crossover.
+     * Manages the timing for each operation using Swing Timers.
+     *
+     * @throws RuntimeException if the custom fitness function script fails during evolution.
+     */
     private void evolvingPopulation() {
         twins = !avoidTwinsCheckBox.isSelected();
         applyCustomRenderer = false;
@@ -910,7 +946,11 @@ public class GUI2 extends JFrame {
     }
 
     /**
-     * To get the two best individuals
+     * Identifies and updates the two best individuals in the population within the output table.
+     *
+     * This method first finds the two best individuals from the population using selection algorithms.
+     * Then, it updates the output table by removing rows that do not correspond to the best individuals.
+     * A timer is used to control the rate of these updates.
      */
     private void getTwoBestIndividuals() {
         Individuals[] best = Selection.selection(pop, pop.length);
@@ -952,6 +992,13 @@ public class GUI2 extends JFrame {
         timer1.start();
     }
 
+    /**
+     * Custom table cell renderer that colors the cell content based on genetic operations.
+     *
+     * This renderer class extends the DefaultTableCellRenderer to provide custom coloring
+     * for certain cells in a JTable. The cells are colored based on the row and column
+     * conditions to represent various genetic mutations and crossovers.
+     */
     static class MyCellRenderer extends DefaultTableCellRenderer {
 
         public Component getTableCellRendererComponent(JTable table, Object value,

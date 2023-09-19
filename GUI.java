@@ -30,12 +30,27 @@ public class GUI extends JFrame {
     private int[] counter = {0, 0};
     //endregion
 
-
+    /**
+     * The entry point for the application.
+     * <p>
+     * This method initializes the GUI by invoking the GUI constructor in the Event Dispatch Thread.
+     * </p>
+     *
+     * @param args Command-line arguments. Not used in this application.
+     */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(GUI::new);
     }
 
-    public GUI() {
+    /**
+     * Initializes the Genetic Algorithm GUI.
+     *
+     * The GUI includes fields for setting the number of individuals, fitness function, and number of mutations.
+     * It also features a JTable to display the state of the algorithm and buttons to control the simulation.
+     *
+     * @throws RuntimeException If a ScriptException occurs during fitness evaluation.
+     */
+    public GUI() throws RuntimeException {
         setBounds(700, 150, 700, 480);
         setTitle("Genetic Algorithm");
         try {
@@ -255,6 +270,14 @@ public class GUI extends JFrame {
         setVisible(true);
     }
 
+    /**
+     * Generates the initial population for the Genetic Algorithm.
+     *
+     * This method reads user inputs for the number of individuals, the number of mutations, and the custom fitness function.
+     * It then initializes an array of Individuals objects and fills a JTable to display their state.
+     *
+     * @throws ScriptException If the fitness evaluation fails.
+     */
     private void generateInitialPopulation() throws ScriptException {
         String nbpopString = nbpopTextField.getText();
         String nbMutationString = nbMutationTextField.getText();
@@ -314,6 +337,14 @@ public class GUI extends JFrame {
 
     }
 
+    /**
+     * Evolves the existing population by performing selection, crossover, and mutation.
+     *
+     * The method uses a timer to sequentially perform genetic operations and update the table accordingly.
+     * Selection is performed to get two best individuals. A crossover or mutation operation is then
+     * performed based on certain conditions, resulting in a new individual that is added to the population.
+     * The table is updated to display the new state of the population.
+     */
     private void evolvingPopulation() {
         twins = !avoidTwinsCheckBox.isSelected();
         applyCustomRenderer = false;
@@ -372,6 +403,16 @@ public class GUI extends JFrame {
         }).start();
         time = 0;
     }
+
+    /**
+     * Continuously evolves the population until certain termination conditions are met.
+     *
+     * This method iteratively applies genetic algorithms on the population to find the best two individuals.
+     * The population undergoes a series of evolution operations until the fitness of the two best individuals is zero.
+     * The state of the two best individuals is then added to the table.
+     *
+     * @throws ScriptException if there is an issue with script execution during evolution.
+     */
     private void evolvedPopulation() throws ScriptException {
         twins = !avoidTwinsCheckBox.isSelected();
         applyCustomRenderer = false;
@@ -400,7 +441,13 @@ public class GUI extends JFrame {
 
     }
 
-    /** To get the two best individuals*/
+    /**
+     * Identifies and updates the two best individuals in the population within the output table.
+     *
+     * This method first finds the two best individuals from the population using selection algorithms.
+     * Then, it updates the output table by removing rows that do not correspond to the best individuals.
+     * A timer is used to control the rate of these updates.
+     */
     private void getTwoBestIndividuals() {
         Individuals[] best = Selection.selection(pop, pop.length);
         AtomicInteger nbBest0 = new AtomicInteger();
@@ -438,9 +485,26 @@ public class GUI extends JFrame {
         timer1.start();
     }
 
-    // Custom cell renderer
+    /**
+     * Custom table cell renderer that colors the cell content based on genetic operations.
+     *
+     * This renderer class extends the DefaultTableCellRenderer to provide custom coloring
+     * for certain cells in a JTable. The cells are colored based on the row and column
+     * conditions to represent various genetic mutations and crossovers.
+     */
     static class MyCellRenderer extends DefaultTableCellRenderer {
-
+        /**
+         * Overrides the getTableCellRendererComponent method to apply custom coloring logic.
+         *
+         * @param table The JTable.
+         * @param value The value to be rendered.
+         * @param isSelected Whether the cell is selected.
+         * @param hasFocus Whether the cell has focus.
+         * @param row The row index.
+         * @param column The column index.
+         * @param irow Additional row indicator for special cases.
+         * @return The colored table cell component.
+         */
         public Component getTableCellRendererComponent(JTable table, Object value,
                                                        boolean isSelected, boolean hasFocus,
                                                         int row, int column, int irow) {
