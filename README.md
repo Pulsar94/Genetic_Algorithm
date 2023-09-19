@@ -45,4 +45,4 @@ The individual who cancels the function (result equal to 0) is the best individu
 
 To run the project, you need to set up your SDK to 1.8.\
 Run the `Main` function in `Main.java` to start the program in the terminal.\
-Run the `Main` function in `GUI.java` to start the program with the Graphic User Interface.
+Run `GUI` file to start the program with the Graphic User Interface.
